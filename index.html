@@ -231,63 +231,65 @@
     }
 
     /* ── KEYBOARD (responsive, no overflow) ── */
-  #keyboard {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    width: 100%;
-   padding: 0 10px;         /* prevents Q/P touching screen edge */
-   max-width: 580px;
-  }
+/* ── KEYBOARD (actually smaller) ── */
+#keyboard{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
 
-  .kb-row {
-    display: flex;
-    width: 100%;             /* row stretches to available space */
-    justify-content: center;
-    gap: clamp(3px, 0.8vw, 6px);
-  }
+  /* THIS is what makes it smaller */
+  width: min(520px, 92vw);   /* try 480px if you want even smaller */
+  margin: 0 auto;
+  padding: 0 6px;
+}
 
-  .key {
-   background: var(--key-bg);
-    color: var(--text);
-    border: none;
-   border-radius: 4px;
+.kb-row{
+  display:flex;
+  justify-content:center;
+  width:100%;
+  gap: 4px;                  /* tighter spacing */
+}
 
-    height: clamp(44px, 7.2vw, 56px); /* shrink on small screens */
-    flex: 1 1 0;                      /* evenly distribute */
-    min-width: 0;                     /* IMPORTANT: allows shrinking (stops overflow) */
-    max-width: clamp(28px, 8.5vw, 44px);
+/* keys no longer "stretch"; they have a target width */
+.key{
+  background: var(--key-bg);
+  color: var(--text);
+  border:none;
+  border-radius:4px;
 
-   padding: 0;
-    font-size: clamp(0.62rem, 1.9vw, 0.82rem);
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.08s;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  height: 48px;              /* shorter */
+  width: clamp(26px, 7vw, 38px);  /* narrower */
+  padding: 0;
+  font-size: 0.75rem;
 
-  .key.wide {
-    flex: 1.35 1 0;                     /* wider than normal keys */
-    max-width: clamp(48px, 14vw, 74px); /* still responsive */
-    font-size: clamp(0.55rem, 1.7vw, 0.7rem);
-  }
+  font-weight:700;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition: background 0.15s, transform 0.08s;
+  user-select:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 
-  .key:active { transform: scale(0.93); }
-  .key.correct { background: var(--green); }
-  .key.present { background: var(--yellow); }
-  .key.absent  { background: var(--absent); }
+/* wide keys still wider, but not huge */
+.key.wide{
+  width: clamp(52px, 14vw, 70px);
+  font-size: 0.65rem;
+}
+
+.key:active { transform: scale(0.93); }
+.key.correct { background: var(--green); }
+.key.present { background: var(--yellow); }
+.key.absent  { background: var(--absent); }
 
 /* extra tiny phones */
-  @media (max-width: 360px) {
-    #keyboard { padding: 0 8px; }
-    .kb-row { gap: 3px; }
-    .key { height: 42px; }
-  }
+@media (max-width: 360px){
+  #keyboard{ width: 96vw; }
+  .key{ height: 44px; width: 24px; font-size: 0.7rem; }
+  .key.wide{ width: 56px; }
+}
 
     /* ── TOAST MESSAGE ── */
     #toast {
