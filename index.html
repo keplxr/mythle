@@ -1188,17 +1188,24 @@ function revealRow(rowIndex, colors, guess) {
     const color = colors[c];
     const delay = c * 320;
 
+    // ✅ ALWAYS lock the letter into the tile for this row
+    tile.textContent = guess[c];
+
     setTimeout(() => {
       tile.style.transition = 'transform 0.16s ease-in';
       tile.style.transform  = 'rotateX(90deg)';
 
       setTimeout(() => {
+        // ✅ lock it again at the peak of the flip (prevents “blank” tiles)
+        tile.textContent = guess[c];
+
         tile.classList.add(color);
         tile.classList.remove('filled');
 
         tile.style.transition = 'transform 0.16s ease-out';
         tile.style.transform  = 'rotateX(0deg)';
 
+        // keyboard status update
         const letter = guess[c];
         const cur = letterStatus[letter];
         if (!cur || priority[color] > priority[cur]) {
