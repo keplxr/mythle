@@ -1312,42 +1312,36 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    async function loadLeaderboard() {
+async function loadLeaderboard() {
+  const code = currentPuzzleCode();
+  document.getElementById('lb-sub').textContent = `Puzzle: ${code.slice(0, 10)}…`;
 
-      if (!supabase) {
-        document.getElementById('lb-sub').textContent = 'Leaderboard unavailable';
-        return;
-      }
-      
-      const code = currentPuzzleCode();
-      document.getElementById('lb-sub').textContent = `Puzzle: ${code.slice(0, 10)}…`;
+  // If Supabase didn't load, don't crash the game
+  if (!supabase) {
+    document.getElementById('lb-sub').textContent = 'Leaderboard unavailable';
+    renderLeaderboard([]);
+    return;
+  }
 
-      // If Supabase didn't load, don't crash the game
-      if (!supabase) {
-        document.getElementById('lb-sub').textContent = 'Leaderboard unavailable';
-        renderLeaderboard([]);
-        return;
-      }
+  const { data, error } = await supabase
+    .from('mythle_scores')
+    .select('player_name, guesses, time_ms, hint_used, created_at')
+    .eq('puzzle_code', code)
+    .order('guesses', { ascending: true })
+    .order('time_ms', { ascending: true })
+    .order('hint_used', { ascending: true })
+    .order('created_at', { ascending: true })
+    .limit(LB_LIMIT);
 
-      const { data, error } = await supabase
-        .from('mythle_scores')
-        .select('player_name, guesses, time_ms, hint_used, created_at')
-        .eq('puzzle_code', code)
-        .order('guesses', { ascending: true })
-        .order('time_ms', { ascending: true })
-        .order('hint_used', { ascending: true })
-        .order('created_at', { ascending: true })
-        .limit(LB_LIMIT);
+  if (error) {
+    console.error(error);
+    toast('Leaderboard failed to load');
+    renderLeaderboard([]);
+    return;
+  }
 
-      if (error) {
-        console.error(error);
-        toast('Leaderboard failed to load');
-        renderLeaderboard([]);
-        return;
-      }
-
-      renderLeaderboard(data || []);
-    }
+  renderLeaderboard(data || []);
+}
 
     async function submitScore() {
       if (!supabase) { toast("Leaderboard not available"); return; }
