@@ -526,6 +526,7 @@
   <h1>MYTHLE</h1>
   <p>Mythical Based Wordle</p>
   <button class="how-to-btn" onclick="openModal()" title="How to play">?</button>
+  <button class="how-to-btn" style="right:56px;" onclick="goDaily()" title="Daily">📅</button>
 </header>
 
 <main>
@@ -695,6 +696,9 @@ if (PUZZLE_CODE) {
   if (forcedWord) forcedEntry = WORD_LIST.find(w => w.word === forcedWord) || null;
 }
 
+  function goDaily() {
+  window.location.href = "./daily/";
+}
 // ──────────────────────────────────────────────
 // GAME STATE
 // ──────────────────────────────────────────────
