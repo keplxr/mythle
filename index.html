@@ -91,39 +91,6 @@
       max-width: 580px;
     }
 
-    /* ── MODE TABS ── */
-    .mode-tabs{
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .mode-tab{
-      background: rgba(255,255,255,0.06);
-      border: 1.5px solid rgba(255,255,255,0.18);
-      color: rgba(255,255,255,0.65);
-      padding: 9px 18px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.6px;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.08s;
-      user-select: none;
-    }
-    .mode-tab:hover{
-      background: rgba(240,192,64,0.12);
-      border-color: rgba(240,192,64,0.4);
-      color: var(--gold);
-    }
-    .mode-tab.active{
-      background: var(--red);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-    .mode-tab:active{ transform: scale(0.97); }
-
     /* ── INFO BAR ── */
     .info-bar {
       display: flex;
@@ -164,7 +131,6 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      user-select: none;
     }
     .hint-reveal-btn:hover {
       background: rgba(255,255,255,0.1);
@@ -232,7 +198,9 @@
     .tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
 
     /* pop on letter entry */
-    .tile.pop { animation: pop 0.1s ease; }
+    .tile.pop {
+      animation: pop 0.1s ease;
+    }
     @keyframes pop {
       0%   { transform: scale(1); }
       50%  { transform: scale(1.15); }
@@ -240,7 +208,9 @@
     }
 
     /* row shake */
-    .shake { animation: shake 0.45s ease; }
+    .shake {
+      animation: shake 0.45s ease;
+    }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       20%     { transform: translateX(-5px); }
@@ -250,7 +220,9 @@
     }
 
     /* bounce on win */
-    .tile.bounce { animation: bounce 0.5s ease forwards; }
+    .tile.bounce {
+      animation: bounce 0.5s ease forwards;
+    }
     @keyframes bounce {
       0%   { transform: translateY(0); }
       40%  { transform: translateY(-18px); }
@@ -259,62 +231,63 @@
     }
 
     /* ── KEYBOARD (responsive, no overflow) ── */
-    #keyboard {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: center;
-      width: 100%;
-      padding: 0 10px;
-      max-width: 580px;
-    }
+  #keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+   padding: 0 10px;         /* prevents Q/P touching screen edge */
+   max-width: 580px;
+  }
 
-    .kb-row {
-      display: flex;
-      width: 100%;
-      justify-content: center;
-      gap: clamp(3px, 0.8vw, 6px);
-    }
+  .kb-row {
+    display: flex;
+    width: 100%;             /* row stretches to available space */
+    justify-content: center;
+    gap: clamp(3px, 0.8vw, 6px);
+  }
 
-    .key {
-      background: var(--key-bg);
-      color: var(--text);
-      border: none;
-      border-radius: 4px;
+  .key {
+   background: var(--key-bg);
+    color: var(--text);
+    border: none;
+   border-radius: 4px;
 
-      height: clamp(44px, 7.2vw, 56px);
-      flex: 1 1 0;
-      min-width: 0;
-      max-width: clamp(28px, 8.5vw, 44px);
+    height: clamp(44px, 7.2vw, 56px); /* shrink on small screens */
+    flex: 1 1 0;                      /* evenly distribute */
+    min-width: 0;                     /* IMPORTANT: allows shrinking (stops overflow) */
+    max-width: clamp(28px, 8.5vw, 44px);
 
-      padding: 0;
-      font-size: clamp(0.62rem, 1.9vw, 0.82rem);
-      font-weight: 700;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.08s;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+   padding: 0;
+    font-size: clamp(0.62rem, 1.9vw, 0.82rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.08s;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .key.wide {
-      flex: 1.35 1 0;
-      max-width: clamp(48px, 14vw, 74px);
-      font-size: clamp(0.55rem, 1.7vw, 0.7rem);
-    }
+  .key.wide {
+    flex: 1.35 1 0;                     /* wider than normal keys */
+    max-width: clamp(48px, 14vw, 74px); /* still responsive */
+    font-size: clamp(0.55rem, 1.7vw, 0.7rem);
+  }
 
-    .key:active { transform: scale(0.93); }
-    .key.correct { background: var(--green); }
-    .key.present { background: var(--yellow); }
-    .key.absent  { background: var(--absent); }
+  .key:active { transform: scale(0.93); }
+  .key.correct { background: var(--green); }
+  .key.present { background: var(--yellow); }
+  .key.absent  { background: var(--absent); }
 
-    @media (max-width: 360px) {
-      #keyboard { padding: 0 8px; }
-      .kb-row { gap: 3px; }
-      .key { height: 42px; }
-    }
+/* extra tiny phones */
+  @media (max-width: 360px) {
+    #keyboard { padding: 0 8px; }
+    .kb-row { gap: 3px; }
+    .key { height: 42px; }
+  }
 
     /* ── TOAST MESSAGE ── */
     #toast {
@@ -340,21 +313,9 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ── RESULT OVERLAY + PANEL (CENTERED) ── */
-    #result-overlay{
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.65);
-      z-index: 240;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    #result-overlay.show{ display: flex; }
-
+    /* ── RESULT PANEL ── */
     #result {
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       gap: 10px;
@@ -364,8 +325,10 @@
       padding: 22px 28px;
       text-align: center;
       animation: fadeUp 0.35s ease;
-      width: min(92vw, 360px);
+      width: 100%;
+      max-width: 360px;
     }
+    #result.show { display: flex; }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -379,13 +342,12 @@
     .answer-display {
       font-size: 1.1rem;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 4px;
       color: var(--gold);
       background: rgba(240,192,64,0.1);
       padding: 8px 18px;
       border-radius: 8px;
       border: 1px solid rgba(240,192,64,0.3);
-      word-break: break-word;
     }
     .new-game-btn {
       background: var(--red);
@@ -399,7 +361,6 @@
       letter-spacing: 1px;
       transition: background 0.2s, transform 0.1s;
       margin-top: 4px;
-      user-select: none;
     }
     .new-game-btn:hover  { background: var(--red-dark); }
     .new-game-btn:active { transform: scale(0.97); }
@@ -461,9 +422,11 @@
       top: 14px; right: 16px;
       background: none; border: none; color: var(--text-dim);
       font-size: 1.4rem; cursor: pointer; line-height: 1;
-      user-select: none;
     }
     .modal-close:hover { color: var(--text); }
+
+    /* ── RESPONSIVE TILE SIZES ── */
+    /* Tile size is set via JS inline style on #grid */
 
     /* ── FOOTER ── */
     footer {
@@ -502,7 +465,6 @@
       transition: background 0.15s, border-color 0.15s, color 0.15s;
       letter-spacing: 0.5px;
       flex-shrink: 0;
-      user-select: none;
     }
     .cat-pill:hover {
       background: rgba(240,192,64,0.12);
@@ -535,12 +497,6 @@
   <div style="width:100%">
     <div class="cat-section-label" style="margin-bottom:6px">Category</div>
     <div class="cat-bar" id="cat-bar"></div>
-
-    <!-- MODE TABS -->
-    <div class="mode-tabs" id="mode-tabs">
-      <button class="mode-tab active" data-mode="daily" onclick="setMode('daily')">Daily</button>
-      <button class="mode-tab" data-mode="infinite" onclick="setMode('infinite')">Infinite</button>
-    </div>
   </div>
 
   <div class="info-bar">
@@ -562,6 +518,13 @@
 
   <div id="grid"></div>
 
+  <div id="result">
+    <h2 id="result-title"></h2>
+    <p id="result-msg"></p>
+    <div class="answer-display" id="result-answer"></div>
+    <button class="new-game-btn" onclick="newGame()">Play Again</button>
+  </div>
+
   <div id="keyboard">
     <div class="kb-row" id="kb-row-1"></div>
     <div class="kb-row" id="kb-row-2"></div>
@@ -574,16 +537,6 @@
 <footer>
   <p>MYTHLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett & Link in any way.</p>
 </footer>
-
-<!-- RESULT (CENTERED OVERLAY) -->
-<div id="result-overlay" onclick="closeResultOutside(event)">
-  <div id="result">
-    <h2 id="result-title"></h2>
-    <p id="result-msg"></p>
-    <div class="answer-display" id="result-answer"></div>
-    <button class="new-game-btn" onclick="newGame()">Play Again</button>
-  </div>
-</div>
 
 <!-- HOW TO PLAY MODAL -->
 <div id="modal-overlay" onclick="closeModalOutside(event)">
@@ -668,11 +621,13 @@ const WORDS = [
   { word:"SOCIETY", cat:"Mythical",hint:"Mythical ___, their fan membership club" },
   { word:"EPISODE", cat:"Shows",   hint:"Each daily GMM upload is an ___ of the show" },
 
+
   // 8 letters
   { word:"MYTHICAL",  cat:"Mythical", hint:"The brand, the company, the lifestyle — it's all ___" },
   { word:"SANDWICH",  cat:"Food",     hint:"A Hotdog Is a ____, a podcast" },
   { word:"SMOOTHIE",  cat:"Food",     hint:"Will it ___? Blended edition" },
-  { word:"BISCUITS",  cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
+  { word:"BISCUITS", cat:"Podcast", hint:"Ear ___, their long-running podcast" },
+
 
   // 11 letters
   { word:"MYTHICALITY", cat:"Mythical", hint:"Spin the Wheel of ___!" },
@@ -690,8 +645,6 @@ const WORD_LIST = WORDS.filter(w => {
 // GAME STATE
 // ──────────────────────────────────────────────
 let selectedCategory = 'All';
-let gameMode = 'daily'; // 'daily' | 'infinite'
-
 let hintRevealed = false;
 let answer = '';
 let wordLen = 0;
@@ -712,80 +665,10 @@ const LOSE_LINES = [
 ];
 
 // ──────────────────────────────────────────────
-// DAILY MODE HELPERS (deterministic + saved progress)
-// ──────────────────────────────────────────────
-function todayKey() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-function dailyStorageKey() {
-  return `MYTHLE_DAILY_${todayKey()}_${selectedCategory}`;
-}
-
-// string -> seeded number
-function xmur3(str) {
-  let h = 1779033703 ^ str.length;
-  for (let i = 0; i < str.length; i++) {
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function() {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    h ^= h >>> 16;
-    return h >>> 0;
-  };
-}
-function mulberry32(a) {
-  return function() {
-    let t = (a += 0x6D2B79F5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function pickDailyWord(pool) {
-  const seedStr = `${todayKey()}|${selectedCategory}|MYTHLE`;
-  const seed = xmur3(seedStr)();
-  const rand = mulberry32(seed);
-  return pool[Math.floor(rand() * pool.length)];
-}
-
-function loadDailyState() {
-  try {
-    const raw = localStorage.getItem(dailyStorageKey());
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-function saveDailyState(saved) {
-  if (gameMode !== 'daily') return;
-  localStorage.setItem(dailyStorageKey(), JSON.stringify(saved));
-}
-function buildSavedState(guesses = [], colors = []) {
-  return {
-    selectedCategory,
-    answer,
-    wordLen,
-    maxGuesses,
-    currentRow,
-    currentInput,
-    gameOver,
-    hintRevealed,
-    letterStatus,
-    guesses,
-    colors
-  };
-}
-
-// ──────────────────────────────────────────────
 // CATEGORY BAR
 // ──────────────────────────────────────────────
 function buildCategoryBar() {
+  // Derive ordered unique categories; count words per category
   const counts = {};
   WORD_LIST.forEach(w => { counts[w.cat] = (counts[w.cat] || 0) + 1; });
   const cats = ['All', ...Object.keys(counts).sort()];
@@ -810,18 +693,6 @@ function buildCategoryBar() {
 }
 
 // ──────────────────────────────────────────────
-// MODE TABS
-// ──────────────────────────────────────────────
-function setMode(mode) {
-  gameMode = mode;
-
-  document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.mode-tab[data-mode="${mode}"]`)?.classList.add('active');
-
-  newGame();
-}
-
-// ──────────────────────────────────────────────
 // HINT REVEAL
 // ──────────────────────────────────────────────
 function revealHint() {
@@ -835,123 +706,50 @@ function revealHint() {
   hintRevealed = true;
   maxGuesses--;
 
-  // ✅ remove ONE row without rebuilding everything
   const grid = document.getElementById('grid');
   const rows = grid.querySelectorAll('.grid-row');
-  if (rows.length) grid.removeChild(rows[rows.length - 1]);
+  grid.removeChild(rows[rows.length - 1]);
 
   document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
   document.getElementById('hint-reveal-btn').style.display = 'none';
   document.getElementById('hint-revealed').classList.add('show');
 
-  // ✅ save daily state (if daily)
-  if (gameMode === 'daily') {
-    const saved = loadDailyState() || { guesses: [], colors: [] };
-    saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
-  }
-
   toast('Hint revealed! −1 guess');
 }
 
-// runtime buffers (used for infinite redraw after hint rebuild)
-let runtimeGuesses = [];
-let runtimeColors = [];
-
 // ──────────────────────────────────────────────
-// INIT / NEW GAME
+// INIT
 // ──────────────────────────────────────────────
 function newGame() {
-  closeResult(); // hide result overlay if open
-
   const pool = selectedCategory === 'All'
     ? WORD_LIST
     : WORD_LIST.filter(w => w.cat === selectedCategory);
 
   if (!pool.length) { toast('No words in this category!'); return; }
 
-  // DAILY: resume if exists
-  if (gameMode === 'daily') {
-    const saved = loadDailyState();
-    if (saved && saved.answer) {
-      answer = saved.answer;
-      wordLen = saved.wordLen;
-      maxGuesses = saved.maxGuesses;
-      currentRow = saved.currentRow;
-      currentInput = saved.currentInput || '';
-      gameOver = saved.gameOver;
-      hintRevealed = saved.hintRevealed;
-      letterStatus = saved.letterStatus || {};
-      runtimeGuesses = []; // not used in daily
-      runtimeColors = [];
-
-      const entry = WORD_LIST.find(w => w.word === answer) || pool[0];
-
-      document.getElementById('badge-length').textContent = `${wordLen} Letters`;
-      document.getElementById('badge-cat').textContent = `Category: ${entry.cat}`;
-      document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
-      document.getElementById('hint-text').textContent = entry.hint;
-
-      document.getElementById('hint-reveal-btn').style.display = hintRevealed ? 'none' : '';
-      document.getElementById('hint-revealed').classList.toggle('show', !!hintRevealed);
-
-      buildGrid();
-      buildKeyboard();
-
-      // replay saved guesses instantly
-      const guesses = saved.guesses || [];
-      const colors  = saved.colors || [];
-      for (let r = 0; r < guesses.length; r++) {
-        const g = guesses[r];
-        const cs = colors[r];
-        for (let c = 0; c < wordLen; c++) {
-          const tile = document.getElementById(`tile-${r}-${c}`);
-          tile.textContent = g[c];
-          tile.classList.add(cs[c]);
-        }
-      }
-      syncKeyboard();
-
-      // show result if finished
-      if (gameOver) {
-        const won = guesses.length && guesses[guesses.length - 1] === answer;
-        showResult(won, won ? guesses.length : 0);
-      }
-
-      return;
-    }
-  }
-
-  // fresh start (daily or infinite)
-  const entry = (gameMode === 'daily')
-    ? pickDailyWord(pool)
-    : pool[Math.floor(Math.random() * pool.length)];
-
-  answer = entry.word;
-  wordLen = answer.length;
-  maxGuesses = 6;
-  currentRow = 0;
+  const entry = pool[Math.floor(Math.random() * pool.length)];
+  answer      = entry.word;
+  wordLen     = answer.length;
+  maxGuesses   = 6;
+  currentRow   = 0;
   currentInput = '';
-  gameOver = false;
+  gameOver     = false;
   letterStatus = {};
   hintRevealed = false;
 
-  runtimeGuesses = [];
-  runtimeColors = [];
-
-  document.getElementById('badge-length').textContent = `${wordLen} Letters`;
-  document.getElementById('badge-cat').textContent = `Category: ${entry.cat}`;
-  document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
-  document.getElementById('hint-text').textContent = entry.hint;
-
+  document.getElementById('badge-length').textContent   = `${wordLen} Letters`;
+  document.getElementById('badge-cat').textContent      = `Category: ${entry.cat}`;
+  document.getElementById('badge-guesses').textContent  = `${maxGuesses} Guesses`;
+  document.getElementById('hint-text').textContent      = entry.hint;
   document.getElementById('hint-reveal-btn').style.display = '';
   document.getElementById('hint-revealed').classList.remove('show');
+  document.getElementById('result').classList.remove('show');
 
   buildGrid();
   buildKeyboard();
 
-  if (gameMode === 'daily') {
-    saveDailyState(buildSavedState([], []));
-  }
+  // Debug: uncomment to see answer in console
+  // console.log('%cAnswer: ' + answer, 'color: #f0c040; font-weight:bold; font-size:14px');
 }
 
 // ──────────────────────────────────────────────
@@ -963,7 +761,7 @@ function buildGrid() {
 
   // Responsive tile size
   const vw = Math.min(window.innerWidth, 580);
-  const maxTileArea = vw - 32;
+  const maxTileArea = vw - 32; // padding
   const rawSize = Math.floor((maxTileArea - (wordLen - 1) * 5) / wordLen);
   const tileSize = Math.max(36, Math.min(62, rawSize));
 
@@ -979,37 +777,6 @@ function buildGrid() {
       row.appendChild(tile);
     }
     grid.appendChild(row);
-  }
-}
-
-// redraw helper (used after hint rebuild)
-function redrawFromBuffers() {
-  if (gameMode === 'daily') {
-    const saved = loadDailyState();
-    if (!saved) return;
-    const guesses = saved.guesses || [];
-    const colors  = saved.colors || [];
-    for (let r = 0; r < guesses.length; r++) {
-      const g = guesses[r];
-      const cs = colors[r];
-      for (let c = 0; c < wordLen; c++) {
-        const tile = document.getElementById(`tile-${r}-${c}`);
-        tile.textContent = g[c];
-        tile.classList.add(cs[c]);
-      }
-    }
-    syncKeyboard();
-  } else {
-    for (let r = 0; r < runtimeGuesses.length; r++) {
-      const g = runtimeGuesses[r];
-      const cs = runtimeColors[r];
-      for (let c = 0; c < wordLen; c++) {
-        const tile = document.getElementById(`tile-${r}-${c}`);
-        tile.textContent = g[c];
-        tile.classList.add(cs[c]);
-      }
-    }
-    syncKeyboard();
   }
 }
 
@@ -1038,6 +805,7 @@ function buildKeyboard() {
 }
 
 function syncKeyboard() {
+  const priority = { correct: 3, present: 2, absent: 1 };
   document.querySelectorAll('.key').forEach(btn => {
     const k = btn.dataset.key;
     const s = letterStatus[k];
@@ -1070,8 +838,9 @@ function addLetter(letter) {
   const tile = document.getElementById(`tile-${currentRow}-${idx}`);
   tile.textContent = letter;
   tile.classList.add('filled');
+  // pop animation
   tile.classList.remove('pop');
-  void tile.offsetWidth;
+  void tile.offsetWidth; // reflow
   tile.classList.add('pop');
 }
 
@@ -1094,63 +863,22 @@ function submitGuess() {
     return;
   }
 
-    // ✅ force the row's letters to exist in the tiles before reveal
-  for (let c = 0; c < wordLen; c++) {
-    const tile = document.getElementById(`tile-${currentRow}-${c}`);
-    tile.textContent = currentInput[c];
-    tile.classList.add('filled');
-  }
   const colors = scoreGuess(currentInput, answer);
   revealRow(currentRow, colors, currentInput);
 
-  // store progress buffers
-  if (gameMode === 'daily') {
-    const saved = loadDailyState() || { guesses: [], colors: [] };
-    const guesses = saved.guesses || [];
-    const allColors = saved.colors || [];
-    guesses.push(currentInput);
-    allColors.push(colors);
-
-    // update state snapshot *after* we increment row below
-    // (we'll save again after updating currentRow)
-    saveDailyState(buildSavedState(guesses, allColors));
-  } else {
-    runtimeGuesses.push(currentInput);
-    runtimeColors.push(colors);
-  }
-
   const won = currentInput === answer;
   const rowIndex = currentRow;
-
   currentRow++;
   currentInput = '';
-
-  // save daily row count/gameover flags
-  if (gameMode === 'daily') {
-    const saved = loadDailyState() || { guesses: [], colors: [] };
-    saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
-  }
 
   const totalDelay = wordLen * 320 + 200;
 
   if (won) {
     gameOver = true;
-
-    if (gameMode === 'daily') {
-      const saved = loadDailyState() || { guesses: [], colors: [] };
-      saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
-    }
-
     setTimeout(() => bounceRow(rowIndex), totalDelay);
     setTimeout(() => showResult(true, rowIndex + 1), totalDelay + wordLen * 80 + 200);
   } else if (currentRow >= maxGuesses) {
     gameOver = true;
-
-    if (gameMode === 'daily') {
-      const saved = loadDailyState() || { guesses: [], colors: [] };
-      saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
-    }
-
     setTimeout(() => showResult(false, 0), totalDelay);
   }
 }
@@ -1163,6 +891,7 @@ function scoreGuess(guess, answer) {
   const aLetters = answer.split('');
   const gLetters = guess.split('');
 
+  // Pass 1: exact matches
   for (let i = 0; i < wordLen; i++) {
     if (gLetters[i] === aLetters[i]) {
       result[i] = 'correct';
@@ -1170,6 +899,7 @@ function scoreGuess(guess, answer) {
       gLetters[i] = null;
     }
   }
+  // Pass 2: present but wrong spot
   for (let i = 0; i < wordLen; i++) {
     if (!gLetters[i]) continue;
     const ai = aLetters.indexOf(gLetters[i]);
@@ -1192,36 +922,27 @@ function revealRow(rowIndex, colors, guess) {
     const color = colors[c];
     const delay = c * 320;
 
-    // ✅ ALWAYS lock the letter into the tile for this row
-    tile.textContent = guess[c];
-
     setTimeout(() => {
+      // flip to 90deg
       tile.style.transition = 'transform 0.16s ease-in';
       tile.style.transform  = 'rotateX(90deg)';
 
       setTimeout(() => {
-        // ✅ lock it again at the peak of the flip (prevents “blank” tiles)
-        tile.textContent = guess[c];
-
+        // apply color at peak of flip
         tile.classList.add(color);
         tile.classList.remove('filled');
 
+        // flip back
         tile.style.transition = 'transform 0.16s ease-out';
         tile.style.transform  = 'rotateX(0deg)';
 
-        // keyboard status update
+        // update keyboard state
         const letter = guess[c];
         const cur = letterStatus[letter];
         if (!cur || priority[color] > priority[cur]) {
           letterStatus[letter] = color;
         }
         syncKeyboard();
-
-        // save daily keyboard status updates
-        if (gameMode === 'daily') {
-          const saved = loadDailyState() || { guesses: [], colors: [] };
-          saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
-        }
       }, 160);
     }, delay);
   }
@@ -1263,14 +984,7 @@ function showResult(won, guessCount) {
     document.getElementById('result-answer').textContent = `The word was: ${answer}`;
   }
 
-  document.getElementById('result-overlay').classList.add('show');
-}
-
-function closeResult() {
-  document.getElementById('result-overlay').classList.remove('show');
-}
-function closeResultOutside(e) {
-  if (e.target === document.getElementById('result-overlay')) closeResult();
+  document.getElementById('result').classList.add('show');
 }
 
 // ──────────────────────────────────────────────
@@ -1298,7 +1012,7 @@ function closeModalOutside(e) {
 // START
 // ──────────────────────────────────────────────
 buildCategoryBar();
-setMode('daily'); // default tab
+newGame();
 </script>
 </body>
 </html>
