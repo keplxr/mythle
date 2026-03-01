@@ -1147,14 +1147,6 @@ async function shareResult() {
   }
 }
 
-function copyLeaderboardLink() {
-  const link = puzzleLink();
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(link).then(() => toast('Puzzle link copied!'));
-  } else {
-    window.prompt('Copy puzzle link:', link);
-  }
-}
 
 // ──────────────────────────────────────────────
 // LEADERBOARD (per puzzle code, localStorage)
