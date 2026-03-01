@@ -198,9 +198,7 @@
     .tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
 
     /* pop on letter entry */
-    .tile.pop {
-      animation: pop 0.1s ease;
-    }
+    .tile.pop { animation: pop 0.1s ease; }
     @keyframes pop {
       0%   { transform: scale(1); }
       50%  { transform: scale(1.15); }
@@ -208,9 +206,7 @@
     }
 
     /* row shake */
-    .shake {
-      animation: shake 0.45s ease;
-    }
+    .shake { animation: shake 0.45s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
       20%     { transform: translateX(-5px); }
@@ -220,9 +216,7 @@
     }
 
     /* bounce on win */
-    .tile.bounce {
-      animation: bounce 0.5s ease forwards;
-    }
+    .tile.bounce { animation: bounce 0.5s ease forwards; }
     @keyframes bounce {
       0%   { transform: translateY(0); }
       40%  { transform: translateY(-18px); }
@@ -231,63 +225,56 @@
     }
 
     /* ── KEYBOARD (responsive, no overflow) ── */
-  #keyboard {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: center;
-    width: 100%;
-   padding: 0 10px;         /* prevents Q/P touching screen edge */
-   max-width: 580px;
-  }
+    #keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      width: 100%;
+      padding: 0 10px;
+      max-width: 580px;
+    }
+    .kb-row {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      gap: clamp(3px, 0.8vw, 6px);
+    }
+    .key {
+      background: var(--key-bg);
+      color: var(--text);
+      border: none;
+      border-radius: 4px;
+      height: clamp(44px, 7.2vw, 56px);
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: clamp(28px, 8.5vw, 44px);
+      padding: 0;
+      font-size: clamp(0.62rem, 1.9vw, 0.82rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.08s;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .key.wide {
+      flex: 1.35 1 0;
+      max-width: clamp(48px, 14vw, 74px);
+      font-size: clamp(0.55rem, 1.7vw, 0.7rem);
+    }
+    .key:active { transform: scale(0.93); }
+    .key.correct { background: var(--green); }
+    .key.present { background: var(--yellow); }
+    .key.absent  { background: var(--absent); }
 
-  .kb-row {
-    display: flex;
-    width: 100%;             /* row stretches to available space */
-    justify-content: center;
-    gap: clamp(3px, 0.8vw, 6px);
-  }
-
-  .key {
-   background: var(--key-bg);
-    color: var(--text);
-    border: none;
-   border-radius: 4px;
-
-    height: clamp(44px, 7.2vw, 56px); /* shrink on small screens */
-    flex: 1 1 0;                      /* evenly distribute */
-    min-width: 0;                     /* IMPORTANT: allows shrinking (stops overflow) */
-    max-width: clamp(28px, 8.5vw, 44px);
-
-   padding: 0;
-    font-size: clamp(0.62rem, 1.9vw, 0.82rem);
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.08s;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .key.wide {
-    flex: 1.35 1 0;                     /* wider than normal keys */
-    max-width: clamp(48px, 14vw, 74px); /* still responsive */
-    font-size: clamp(0.55rem, 1.7vw, 0.7rem);
-  }
-
-  .key:active { transform: scale(0.93); }
-  .key.correct { background: var(--green); }
-  .key.present { background: var(--yellow); }
-  .key.absent  { background: var(--absent); }
-
-/* extra tiny phones */
-  @media (max-width: 360px) {
-    #keyboard { padding: 0 8px; }
-    .kb-row { gap: 3px; }
-    .key { height: 42px; }
-  }
+    @media (max-width: 360px) {
+      #keyboard { padding: 0 8px; }
+      .kb-row { gap: 3px; }
+      .key { height: 42px; }
+    }
 
     /* ── TOAST MESSAGE ── */
     #toast {
@@ -425,9 +412,6 @@
     }
     .modal-close:hover { color: var(--text); }
 
-    /* ── RESPONSIVE TILE SIZES ── */
-    /* Tile size is set via JS inline style on #grid */
-
     /* ── FOOTER ── */
     footer {
       width: 100%;
@@ -483,6 +467,13 @@
       color: var(--text-dim);
       align-self: flex-start;
     }
+
+    /* Optional: a subtle secondary button style for Share */
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(240,192,64,0.55);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.10); }
   </style>
 </head>
 <body>
@@ -522,7 +513,9 @@
     <h2 id="result-title"></h2>
     <p id="result-msg"></p>
     <div class="answer-display" id="result-answer"></div>
+
     <button class="new-game-btn" onclick="newGame()">Play Again</button>
+    <button class="new-game-btn btn-secondary" onclick="shareResult()">Share</button>
   </div>
 
   <div id="keyboard">
@@ -621,13 +614,11 @@ const WORDS = [
   { word:"SOCIETY", cat:"Mythical",hint:"Mythical ___, their fan membership club" },
   { word:"EPISODE", cat:"Shows",   hint:"Each daily GMM upload is an ___ of the show" },
 
-
   // 8 letters
   { word:"MYTHICAL",  cat:"Mythical", hint:"The brand, the company, the lifestyle — it's all ___" },
   { word:"SANDWICH",  cat:"Food",     hint:"A Hotdog Is a ____, a podcast" },
   { word:"SMOOTHIE",  cat:"Food",     hint:"Will it ___? Blended edition" },
-  { word:"BISCUITS", cat:"Podcast", hint:"Ear ___, their long-running podcast" },
-
+  { word:"BISCUITS",  cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
 
   // 11 letters
   { word:"MYTHICALITY", cat:"Mythical", hint:"Spin the Wheel of ___!" },
@@ -646,13 +637,15 @@ const WORD_LIST = WORDS.filter(w => {
 // ──────────────────────────────────────────────
 let selectedCategory = 'All';
 let hintRevealed = false;
+let hintUsed = false;        // <-- for sharing
 let answer = '';
 let wordLen = 0;
 let maxGuesses = 6;
 let currentRow = 0;
 let currentInput = '';
 let gameOver = false;
-let letterStatus = {};  // letter -> 'correct'|'present'|'absent'
+let letterStatus = {};       // letter -> 'correct'|'present'|'absent'
+let guessHistory = [];       // <-- for sharing: [{guess, colors}, ...]
 
 const WIN_LINES = [
   { title: "BOOM!", msg: "Excellent work! You're a true Mythical Beast!" },
@@ -668,7 +661,6 @@ const LOSE_LINES = [
 // CATEGORY BAR
 // ──────────────────────────────────────────────
 function buildCategoryBar() {
-  // Derive ordered unique categories; count words per category
   const counts = {};
   WORD_LIST.forEach(w => { counts[w.cat] = (counts[w.cat] || 0) + 1; });
   const cats = ['All', ...Object.keys(counts).sort()];
@@ -704,6 +696,7 @@ function revealHint() {
   }
 
   hintRevealed = true;
+  hintUsed = true;  // <-- for sharing
   maxGuesses--;
 
   const grid = document.getElementById('grid');
@@ -728,14 +721,16 @@ function newGame() {
   if (!pool.length) { toast('No words in this category!'); return; }
 
   const entry = pool[Math.floor(Math.random() * pool.length)];
-  answer      = entry.word;
-  wordLen     = answer.length;
+  answer       = entry.word;
+  wordLen      = answer.length;
   maxGuesses   = 6;
   currentRow   = 0;
   currentInput = '';
   gameOver     = false;
   letterStatus = {};
   hintRevealed = false;
+  hintUsed     = false;   // <-- reset
+  guessHistory = [];      // <-- reset
 
   document.getElementById('badge-length').textContent   = `${wordLen} Letters`;
   document.getElementById('badge-cat').textContent      = `Category: ${entry.cat}`;
@@ -747,9 +742,6 @@ function newGame() {
 
   buildGrid();
   buildKeyboard();
-
-  // Debug: uncomment to see answer in console
-  // console.log('%cAnswer: ' + answer, 'color: #f0c040; font-weight:bold; font-size:14px');
 }
 
 // ──────────────────────────────────────────────
@@ -759,9 +751,8 @@ function buildGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
 
-  // Responsive tile size
   const vw = Math.min(window.innerWidth, 580);
-  const maxTileArea = vw - 32; // padding
+  const maxTileArea = vw - 32;
   const rawSize = Math.floor((maxTileArea - (wordLen - 1) * 5) / wordLen);
   const tileSize = Math.max(36, Math.min(62, rawSize));
 
@@ -838,9 +829,8 @@ function addLetter(letter) {
   const tile = document.getElementById(`tile-${currentRow}-${idx}`);
   tile.textContent = letter;
   tile.classList.add('filled');
-  // pop animation
   tile.classList.remove('pop');
-  void tile.offsetWidth; // reflow
+  void tile.offsetWidth;
   tile.classList.add('pop');
 }
 
@@ -864,6 +854,10 @@ function submitGuess() {
   }
 
   const colors = scoreGuess(currentInput, answer);
+
+  // store for sharing
+  guessHistory.push({ guess: currentInput, colors: [...colors] });
+
   revealRow(currentRow, colors, currentInput);
 
   const won = currentInput === answer;
@@ -891,7 +885,6 @@ function scoreGuess(guess, answer) {
   const aLetters = answer.split('');
   const gLetters = guess.split('');
 
-  // Pass 1: exact matches
   for (let i = 0; i < wordLen; i++) {
     if (gLetters[i] === aLetters[i]) {
       result[i] = 'correct';
@@ -899,7 +892,6 @@ function scoreGuess(guess, answer) {
       gLetters[i] = null;
     }
   }
-  // Pass 2: present but wrong spot
   for (let i = 0; i < wordLen; i++) {
     if (!gLetters[i]) continue;
     const ai = aLetters.indexOf(gLetters[i]);
@@ -923,20 +915,16 @@ function revealRow(rowIndex, colors, guess) {
     const delay = c * 320;
 
     setTimeout(() => {
-      // flip to 90deg
       tile.style.transition = 'transform 0.16s ease-in';
       tile.style.transform  = 'rotateX(90deg)';
 
       setTimeout(() => {
-        // apply color at peak of flip
         tile.classList.add(color);
         tile.classList.remove('filled');
 
-        // flip back
         tile.style.transition = 'transform 0.16s ease-out';
         tile.style.transform  = 'rotateX(0deg)';
 
-        // update keyboard state
         const letter = guess[c];
         const cur = letterStatus[letter];
         if (!cur || priority[color] > priority[cur]) {
@@ -1006,6 +994,59 @@ function openModal()  { document.getElementById('modal-overlay').classList.add('
 function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
 function closeModalOutside(e) {
   if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ──────────────────────────────────────────────
+// SHARING
+// ──────────────────────────────────────────────
+function colorsToEmoji(colors) {
+  return colors.map(c => (c === 'correct' ? '🟩' : c === 'present' ? '🟨' : '⬛')).join('');
+}
+
+function buildShareText() {
+  const entry = WORD_LIST.find(w => w.word === answer);
+  const cat = entry ? entry.cat : selectedCategory;
+
+  const won = guessHistory.length > 0 && guessHistory[guessHistory.length - 1].guess === answer;
+  const guessCount = won ? guessHistory.length : 0;
+
+  const header = `MYTHLE — ${cat} • ${wordLen} letters`;
+  const scoreLine = won ? `Score: ${guessCount}/${maxGuesses}` : `Score: X/${maxGuesses}`;
+  const hintLine = `Hint: ${hintUsed ? 'Used (-1 guess)' : 'Not used'}`;
+
+  const grid = guessHistory.map(r => colorsToEmoji(r.colors)).join('\n');
+
+  // If hosted, this will be your actual page URL
+  const playLink = `${location.origin}${location.pathname}`;
+
+  return `${header}\n${scoreLine}\n${hintLine}\n\n${grid}\n\nPlay: ${playLink}`;
+}
+
+async function shareResult() {
+  if (!gameOver) {
+    toast("Finish the game first!");
+    return;
+  }
+
+  const text = buildShareText();
+
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: 'MYTHLE', text });
+      return;
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      toast('Copied results to clipboard!');
+      return;
+    }
+
+    window.prompt('Copy your results:', text);
+  } catch (err) {
+    if (String(err).toLowerCase().includes('abort')) return; // user cancelled share sheet
+    window.prompt('Copy your results:', text);
+  }
 }
 
 // ──────────────────────────────────────────────
