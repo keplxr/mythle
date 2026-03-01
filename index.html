@@ -179,16 +179,21 @@
     .hint-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #ff9080; font-weight: 700; }
     .hint-text  { font-size: 0.92rem; color: rgba(255,255,255,0.85); font-style: italic; }
 
-    /* ── GRID ── */
+    /* ── GRID (CENTER FIX) ── */
     #grid {
       display: flex;
       flex-direction: column;
       gap: 5px;
+      width: 100%;            /* important */
+      align-items: center;    /* center the rows as items */
       margin: 0 auto;
-      align-items: center;
     }
-    .grid-row { display: flex; gap: 5px; }
-
+    .grid-row {
+      display: flex;
+      gap: 5px;
+      width: 100%;            /* important */
+      justify-content: center;/* important: centers tiles within the row */
+    }
     .tile {
       --size: 58px;
       width: var(--size); height: var(--size);
@@ -464,8 +469,8 @@
 // ================================================================
 //  SUPABASE SETUP  —  free leaderboard, no credit card needed
 // ================================================================
-const SUPABASE_URL = null;
-const SUPABASE_KEY = null;
+const SUPABASE_URL = null;  // e.g. 'https://xxxx.supabase.co'
+const SUPABASE_KEY = null;  // e.g. 'sb_publishable_xxxx'
 
 // ================================================================
 //  WORD LIST
@@ -587,7 +592,8 @@ function buildCategoryBar() {
       if (cat===selectedCategory) return;
       selectedCategory = cat;
       document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
-      btn.classList.add('active'); newGame();
+      btn.classList.add('active');
+      newGame();
     });
     bar.appendChild(btn);
   });
@@ -599,14 +605,47 @@ function buildCategoryBar() {
 function revealHint() {
   if (hintRevealed || gameOver) return;
   if (maxGuesses - currentRow <= 1) { toast("Not enough guesses left for a hint!"); return; }
-  hintRevealed = true; maxGuesses--;
+
+  hintRevealed = true;
+  maxGuesses--;
+
   const grid = document.getElementById('grid'), rows = grid.querySelectorAll('.grid-row');
-  grid.removeChild(rows[rows.length-1]);
+  if (rows.length) grid.removeChild(rows[rows.length-1]);
+
   document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
   document.getElementById('hint-reveal-btn').style.display = 'none';
   document.getElementById('hint-revealed').classList.add('show');
+
   toast('Hint revealed! −1 guess');
 }
+
+// ================================================================
+//  TILE RESIZE (IMPORTANT FIX)
+//  iOS shows/hides keyboard -> triggers resize.
+//  We DO NOT rebuild the grid on resize (that wipes guesses).
+// ================================================================
+function resizeTiles() {
+  if (!wordLen) return;
+
+  const container = document.getElementById('game-area');
+  const cw = Math.min(container.clientWidth, 580);
+
+  const gap = 5;
+  const safety = 2;
+
+  const tileSize = Math.max(
+    36,
+    Math.min(62, Math.floor((cw - safety - (wordLen - 1) * gap) / wordLen))
+  );
+
+  document.querySelectorAll('.tile').forEach(t => {
+    t.style.setProperty('--size', `${tileSize}px`);
+    t.style.fontSize = `${Math.round(tileSize * 0.48)}px`;
+  });
+}
+
+// IMPORTANT: resize just adjusts sizes; it will not delete guesses.
+window.addEventListener('resize', resizeTiles);
 
 // ================================================================
 //  NEW GAME
@@ -614,6 +653,7 @@ function revealHint() {
 function newGame() {
   guessHistory=[]; hintRevealed=false; currentRow=0; currentInput='';
   gameOver=false; letterStatus={}; maxGuesses=6; startTime=Date.now();
+
   document.getElementById('result').classList.remove('show');
   document.getElementById('hint-reveal-btn').style.display='';
   document.getElementById('hint-revealed').classList.remove('show');
@@ -631,13 +671,17 @@ function newGame() {
   }
 
   answer=currentEntry.word; wordLen=answer.length;
+
   document.getElementById('badge-length').textContent  = `${wordLen} Letters`;
   document.getElementById('badge-cat').textContent     = `Category: ${currentEntry.cat}`;
   document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
   document.getElementById('hint-text').textContent     = currentEntry.hint;
   document.getElementById('lb-btn').style.display      = 'none';
   document.getElementById('new-game-btn').style.display = gameMode==='infinite' ? '' : 'none';
-  buildGrid(); buildKeyboard();
+
+  buildGrid();
+  buildKeyboard();
+  resizeTiles(); // size tiles once on start
 }
 
 function showDailyDone(s) {
@@ -659,36 +703,19 @@ function hideDailyDone() {
 // ================================================================
 function buildGrid() {
   const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+  grid.innerHTML='';
 
-  // ✅ measure the real available width (NOT window.innerWidth)
-  const container = document.getElementById('game-area'); // lives inside main, so this matches reality
-  const cw = Math.min(container.clientWidth, 580);
-
-  const gap = 5;      // matches .grid-row gap
-  const safety = 2;   // tiny buffer for rounding
-
-  const tileSize = Math.max(
-    36,
-    Math.min(
-      62,
-      Math.floor((cw - safety - (wordLen - 1) * gap) / wordLen)
-    )
-  );
-
-  for (let r = 0; r < maxGuesses; r++) {
+  for (let r=0; r<maxGuesses; r++) {
     const row = document.createElement('div');
-    row.className = 'grid-row';
-    row.id = `row-${r}`;
+    row.className='grid-row';
+    row.id=`row-${r}`;
 
-    for (let c = 0; c < wordLen; c++) {
+    for (let c=0; c<wordLen; c++) {
       const t = document.createElement('div');
-      t.className = 'tile';
-      t.id = `tile-${r}-${c}`;
-      t.style.cssText = `--size:${tileSize}px;font-size:${Math.round(tileSize * 0.48)}px`;
+      t.className='tile';
+      t.id=`tile-${r}-${c}`;
       row.appendChild(t);
     }
-
     grid.appendChild(row);
   }
 }
@@ -697,19 +724,23 @@ const KB_ROWS=[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H
 function buildKeyboard() {
   KB_ROWS.forEach((row,i)=>{
     const el=document.getElementById(`kb-row-${i+1}`); el.innerHTML='';
-    row.forEach(k=>{ const b=document.createElement('button'); b.className='key'+(k.length>1?' wide':''); b.textContent=k; b.dataset.key=k; b.addEventListener('click',()=>handleKey(k)); el.appendChild(b); });
+    row.forEach(k=>{
+      const b=document.createElement('button');
+      b.className='key'+(k.length>1?' wide':'');
+      b.textContent=k;
+      b.dataset.key=k;
+      b.addEventListener('click',()=>handleKey(k));
+      el.appendChild(b);
+    });
   });
 }
 function syncKeyboard() {
   const p={correct:3,present:2,absent:1};
-  document.querySelectorAll('.key').forEach(b=>{ const k=b.dataset.key,s=letterStatus[k]; b.className='key'+(k.length>1?' wide':'')+(s?` ${s}`:''); });
+  document.querySelectorAll('.key').forEach(b=>{
+    const k=b.dataset.key, s=letterStatus[k];
+    b.className='key'+(k.length>1?' wide':'')+(s?` ${s}`:'');
+  });
 }
-
-// ✅ keep grid centered on rotation/resize
-window.addEventListener('resize', () => {
-  if (answer && !document.getElementById('daily-done').style.display) return;
-  if (answer) buildGrid();
-});
 
 // ================================================================
 //  INPUT
@@ -717,22 +748,33 @@ window.addEventListener('resize', () => {
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.altKey||e.metaKey) return;
   const k=e.key.toUpperCase();
-  if(k==='BACKSPACE') handleKey('⌫'); else if(k==='ENTER') handleKey('ENTER'); else if(/^[A-Z]$/.test(k)) handleKey(k);
+  if(k==='BACKSPACE') handleKey('⌫');
+  else if(k==='ENTER') handleKey('ENTER');
+  else if(/^[A-Z]$/.test(k)) handleKey(k);
 });
+
 function handleKey(key) {
   if(gameOver) return;
-  if(key==='⌫') deleteLetter(); else if(key==='ENTER') submitGuess(); else if(/^[A-Z]$/.test(key)) addLetter(key);
+  if(key==='⌫') deleteLetter();
+  else if(key==='ENTER') submitGuess();
+  else if(/^[A-Z]$/.test(key)) addLetter(key);
 }
+
 function addLetter(letter) {
   if(currentInput.length>=wordLen) return;
   currentInput+=letter;
   const t=document.getElementById(`tile-${currentRow}-${currentInput.length-1}`);
-  t.textContent=letter; t.classList.add('filled'); t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
+  t.textContent=letter;
+  t.classList.add('filled');
+  t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
 }
+
 function deleteLetter() {
   if(!currentInput.length) return;
   const t=document.getElementById(`tile-${currentRow}-${currentInput.length-1}`);
-  t.textContent=''; t.classList.remove('filled','pop'); currentInput=currentInput.slice(0,-1);
+  t.textContent='';
+  t.classList.remove('filled','pop');
+  currentInput=currentInput.slice(0,-1);
 }
 
 // ================================================================
@@ -740,14 +782,27 @@ function deleteLetter() {
 // ================================================================
 function submitGuess() {
   if(currentInput.length<wordLen){ toast(`Need ${wordLen} letters!`); shakeRow(currentRow); return; }
+
   const colors=scoreGuess(currentInput,answer);
-  guessHistory.push(colors); revealRow(currentRow,colors,currentInput);
-  const won=currentInput===answer, rowIndex=currentRow++;
+  guessHistory.push(colors);
+  revealRow(currentRow,colors,currentInput);
+
+  const won=currentInput===answer;
+  const rowIndex=currentRow++;
   currentInput='';
+
   const delay=wordLen*320+200;
-  if(won){ gameOver=true; setTimeout(()=>bounceRow(rowIndex),delay); setTimeout(()=>onGameEnd(true,rowIndex+1,Math.floor((Date.now()-startTime)/1000)),delay+wordLen*80+200); }
-  else if(currentRow>=maxGuesses){ gameOver=true; setTimeout(()=>onGameEnd(false,0,Math.floor((Date.now()-startTime)/1000)),delay); }
+
+  if(won){
+    gameOver=true;
+    setTimeout(()=>bounceRow(rowIndex),delay);
+    setTimeout(()=>onGameEnd(true,rowIndex+1,Math.floor((Date.now()-startTime)/1000)),delay+wordLen*80+200);
+  } else if(currentRow>=maxGuesses){
+    gameOver=true;
+    setTimeout(()=>onGameEnd(false,0,Math.floor((Date.now()-startTime)/1000)),delay);
+  }
 }
+
 function onGameEnd(won,guessCount,elapsed) {
   showResult(won,guessCount);
   if(gameMode==='daily'){
@@ -764,7 +819,11 @@ function onGameEnd(won,guessCount,elapsed) {
 function scoreGuess(guess,answer) {
   const result=Array(wordLen).fill('absent'), a=answer.split(''), g=guess.split('');
   for(let i=0;i<wordLen;i++) if(g[i]===a[i]){result[i]='correct';a[i]=null;g[i]=null;}
-  for(let i=0;i<wordLen;i++){ if(!g[i]) continue; const ai=a.indexOf(g[i]); if(ai!==-1){result[i]='present';a[ai]=null;} }
+  for(let i=0;i<wordLen;i++){
+    if(!g[i]) continue;
+    const ai=a.indexOf(g[i]);
+    if(ai!==-1){result[i]='present';a[ai]=null;}
+  }
   return result;
 }
 
@@ -776,17 +835,32 @@ function revealRow(rowIndex,colors,guess) {
   for(let c=0;c<wordLen;c++){
     const t=document.getElementById(`tile-${rowIndex}-${c}`),color=colors[c];
     setTimeout(()=>{
-      t.style.transition='transform 0.16s ease-in'; t.style.transform='rotateX(90deg)';
+      t.style.transition='transform 0.16s ease-in';
+      t.style.transform='rotateX(90deg)';
       setTimeout(()=>{
-        t.classList.add(color); t.classList.remove('filled');
-        t.style.transition='transform 0.16s ease-out'; t.style.transform='rotateX(0deg)';
-        const l=guess[c],cur=letterStatus[l]; if(!cur||p[color]>p[cur]) letterStatus[l]=color; syncKeyboard();
+        t.classList.add(color);
+        t.classList.remove('filled');
+        t.style.transition='transform 0.16s ease-out';
+        t.style.transform='rotateX(0deg)';
+
+        const l=guess[c],cur=letterStatus[l];
+        if(!cur||p[color]>p[cur]) letterStatus[l]=color;
+        syncKeyboard();
       },160);
     },c*320);
   }
 }
-function bounceRow(ri){ for(let c=0;c<wordLen;c++){ const t=document.getElementById(`tile-${ri}-${c}`); setTimeout(()=>{t.classList.remove('bounce');void t.offsetWidth;t.classList.add('bounce');},c*80); } }
-function shakeRow(ri){ const r=document.getElementById(`row-${ri}`); r.classList.remove('shake');void r.offsetWidth;r.classList.add('shake'); r.addEventListener('animationend',()=>r.classList.remove('shake'),{once:true}); }
+function bounceRow(ri){
+  for(let c=0;c<wordLen;c++){
+    const t=document.getElementById(`tile-${ri}-${c}`);
+    setTimeout(()=>{t.classList.remove('bounce');void t.offsetWidth;t.classList.add('bounce');},c*80);
+  }
+}
+function shakeRow(ri){
+  const r=document.getElementById(`row-${ri}`);
+  r.classList.remove('shake');void r.offsetWidth;r.classList.add('shake');
+  r.addEventListener('animationend',()=>r.classList.remove('shake'),{once:true});
+}
 
 // ================================================================
 //  RESULT
@@ -795,7 +869,9 @@ function showResult(won,guessCount) {
   const pick=(won?WIN_LINES:LOSE_LINES)[Math.floor(Math.random()*(won?WIN_LINES:LOSE_LINES).length)];
   document.getElementById('result-title').textContent=pick.title;
   document.getElementById('result-msg').textContent=pick.msg;
-  document.getElementById('result-answer').textContent=won?`You got it in ${guessCount} guess${guessCount!==1?'es':''}!`:`The word was: ${answer}`;
+  document.getElementById('result-answer').textContent=
+    won ? `You got it in ${guessCount} guess${guessCount!==1?'es':''}!`
+        : `The word was: ${answer}`;
   document.getElementById('result').classList.add('show');
 }
 
@@ -816,12 +892,17 @@ function shareResult() {
     const won=guessHistory.length&&guessHistory[guessHistory.length-1].every(c=>c==='correct');
     text=`MYTHLE ∞ ${won?guessHistory.length+'/'+maxGuesses:'X/'+maxGuesses}\n\n${buildEmojiGrid()}\n\nhttps://keplxr.github.io/mythle`;
   }
-  if(navigator.share){ navigator.share({text}).catch(()=>copyText(text)); } else { copyText(text); }
+  if(navigator.share){ navigator.share({text}).catch(()=>copyText(text)); }
+  else { copyText(text); }
 }
 function copyText(text) {
   navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard!')).catch(()=>{
-    const ta=document.createElement('textarea'); ta.value=text; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); toast('Copied to clipboard!');
+    const ta=document.createElement('textarea');
+    ta.value=text; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Copied to clipboard!');
   });
 }
 
@@ -831,7 +912,12 @@ function copyText(text) {
 async function sbFetch(path, options={}) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', ...(options.headers||{}) }
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      ...(options.headers||{})
+    }
   });
 }
 
@@ -842,7 +928,18 @@ async function submitScore(guesses, elapsed, won) {
     const check = await sbFetch(`scores?daily_index=eq.${getDailyIndex()}&user_id=eq.${getUserId()}&limit=1`);
     const existing = await check.json();
     if(existing.length>0) return;
-    await sbFetch('scores', { method:'POST', body: JSON.stringify({ daily_index:getDailyIndex(), user_id:getUserId(), name, guesses:won?guesses:99, elapsed, won, ts:Date.now() }) });
+    await sbFetch('scores', {
+      method:'POST',
+      body: JSON.stringify({
+        daily_index:getDailyIndex(),
+        user_id:getUserId(),
+        name,
+        guesses:won?guesses:99,
+        elapsed,
+        won,
+        ts:Date.now()
+      })
+    });
   } catch(e) { console.warn('Score submit failed:',e); }
 }
 
@@ -867,7 +964,9 @@ async function loadLeaderboard() {
     }).join('');
     el.innerHTML=`<p style="color:var(--text-dim);font-size:0.8rem;margin-bottom:8px">Daily #${getDailyIndex()} — ${data.length} player${data.length!==1?'s':''}</p>
       <table class="lb-table"><thead><tr><th></th><th>Name</th><th>Guesses</th><th>Time</th></tr></thead><tbody>${rows}</tbody></table>`;
-  } catch(e) { el.innerHTML='<div style="text-align:center;padding:20px;color:#ff9080">Failed to load. Check your connection.</div>'; }
+  } catch(e) {
+    el.innerHTML='<div style="text-align:center;padding:20px;color:#ff9080">Failed to load. Check your connection.</div>';
+  }
 }
 
 // ================================================================
@@ -876,12 +975,17 @@ async function loadLeaderboard() {
 function openLeaderboard() {
   if(SUPABASE_URL&&!getUsername()){
     openNameModal(()=>{
-      const s=getDailyState(); if(s) submitScore(s.won?s.guesses:null,s.elapsed,s.won);
-      setTimeout(()=>{ document.getElementById('lb-overlay').classList.add('show'); loadLeaderboard(); },700);
+      const s=getDailyState();
+      if(s) submitScore(s.won?s.guesses:null,s.elapsed,s.won);
+      setTimeout(()=>{
+        document.getElementById('lb-overlay').classList.add('show');
+        loadLeaderboard();
+      },700);
     });
     return;
   }
-  document.getElementById('lb-overlay').classList.add('show'); loadLeaderboard();
+  document.getElementById('lb-overlay').classList.add('show');
+  loadLeaderboard();
 }
 function closeLeaderboard(){ document.getElementById('lb-overlay').classList.remove('show'); }
 
@@ -889,11 +993,17 @@ function closeLeaderboard(){ document.getElementById('lb-overlay').classList.rem
 //  NAME MODAL
 // ================================================================
 let nameCallback=null;
-function openNameModal(cb){ nameCallback=cb||null; document.getElementById('name-overlay').classList.add('show'); setTimeout(()=>document.getElementById('name-input').focus(),100); }
+function openNameModal(cb){
+  nameCallback=cb||null;
+  document.getElementById('name-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('name-input').focus(),100);
+}
 function confirmUsername(){
   const name=document.getElementById('name-input').value.trim();
   if(!name){ toast('Please enter a name!'); return; }
-  setUsername(name); document.getElementById('name-overlay').classList.remove('show'); document.getElementById('name-input').value='';
+  setUsername(name);
+  document.getElementById('name-overlay').classList.remove('show');
+  document.getElementById('name-input').value='';
   if(nameCallback){ nameCallback(); nameCallback=null; }
 }
 document.getElementById('name-input').addEventListener('keydown',e=>{ if(e.key==='Enter') confirmUsername(); });
@@ -908,7 +1018,13 @@ function closeHowTo(){ document.getElementById('howto-overlay').classList.remove
 //  TOAST
 // ================================================================
 let toastTimer;
-function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),1600); }
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),1600);
+}
 
 // ================================================================
 //  START
