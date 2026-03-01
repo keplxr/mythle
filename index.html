@@ -34,7 +34,7 @@
       overflow-x: hidden;
     }
 
-    /* HEADER */
+    /* ── HEADER ── */
     header {
       width: 100%;
       background: var(--red);
@@ -59,79 +59,138 @@
       text-transform: uppercase;
     }
     .how-to-btn {
-      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-      background: transparent; border: 2px solid var(--gold); color: var(--gold);
-      width: 34px; height: 34px; border-radius: 50%; font-size: 1rem; font-weight: 900;
-      cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .how-to-btn:hover { background: rgba(240,192,64,0.15); }
 
-    /* MODE TABS */
+    /* ── MODE TABS ── */
     .mode-tabs {
-      display: flex; width: 100%; max-width: 580px;
-      background: var(--surface); border-bottom: 2px solid rgba(255,255,255,0.08);
+      display: flex;
+      width: 100%;
+      max-width: 580px;
+      background: var(--surface);
+      border-bottom: 2px solid rgba(255,255,255,0.08);
     }
     .mode-tab {
-      flex: 1; padding: 16px; background: transparent; border: none;
-      color: var(--text-dim); font-size: 0.88rem; font-weight: 700; letter-spacing: 0.5px;
-      cursor: pointer; border-bottom: 3px solid transparent; transition: color 0.15s, border-color 0.15s;
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
     }
     .mode-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
     .mode-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
 
-    /* MAIN */
+    /* ── MAIN ── */
     main {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 28px 16px 40px; gap: 28px; width: 100%; max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 24px;
+      gap: 14px;
+      width: 100%;
+      max-width: 580px;
     }
 
-    /* DAILY DONE BANNER */
+    /* ── DAILY DONE BANNER ── */
     .daily-done-banner {
-      width: 100%; background: var(--surface); border: 2px solid var(--gold);
-      border-radius: 14px; padding: 24px 20px; text-align: center;
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      width: 100%;
+      background: var(--surface);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 24px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
     }
     .daily-done-banner h3 { color: var(--gold); font-size: 1.1rem; letter-spacing: 1px; }
     .countdown-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .countdown-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
     .countdown-display { font-size: 1.5rem; font-weight: 900; color: var(--text); letter-spacing: 3px; font-variant-numeric: tabular-nums; }
 
-    /* INFO BAR */
+    /* ── INFO BAR ── */
     .info-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
     .badge {
-      background: rgba(240,192,64,0.1); border: 1px solid var(--gold); color: var(--gold);
-      padding: 5px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.8px; white-space: nowrap;
+      background: rgba(240,192,64,0.1);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
     }
     .badge.blue { background: rgba(88,130,255,0.1); border-color: rgba(88,130,255,0.5); color: #8aabff; }
 
-    /* HINT */
+    /* ── HINT ── */
     .hint-area { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .hint-reveal-btn {
-      background: rgba(255,255,255,0.05); border: 1.5px dashed rgba(255,255,255,0.25);
-      color: rgba(255,255,255,0.65); padding: 9px 18px; border-radius: 8px; cursor: pointer;
-      font-size: 0.85rem; font-weight: 600; transition: background 0.2s, border-color 0.2s, color 0.2s;
-      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1.5px dashed rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.65);
+      padding: 9px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .hint-reveal-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); color: #fff; }
     .hint-cost-badge {
-      background: rgba(192,57,43,0.35); border: 1px solid rgba(192,57,43,0.6); color: #ff9080;
-      padding: 2px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.5px;
+      background: rgba(192,57,43,0.35);
+      border: 1px solid rgba(192,57,43,0.6);
+      color: #ff9080;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
     }
     .hint-revealed { display: none; flex-direction: column; align-items: center; gap: 3px; }
     .hint-revealed.show { display: flex; }
     .hint-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: #ff9080; font-weight: 700; }
     .hint-text  { font-size: 0.92rem; color: rgba(255,255,255,0.85); font-style: italic; }
 
-    /* GRID */
+    /* ── GRID ── */
     #grid { display: flex; flex-direction: column; gap: 5px; }
     .grid-row { display: flex; gap: 5px; }
     .tile {
-      --size: 58px; width: var(--size); height: var(--size);
-      border: 2px solid var(--tile-border); background: var(--tile-empty);
+      --size: 58px;
+      width: var(--size); height: var(--size);
+      border: 2px solid var(--tile-border);
+      background: var(--tile-empty);
       display: flex; align-items: center; justify-content: center;
-      font-size: calc(var(--size) * 0.5); font-weight: 900; text-transform: uppercase;
-      user-select: none; transition: border-color 0.05s;
+      font-size: calc(var(--size) * 0.5);
+      font-weight: 900; text-transform: uppercase; user-select: none;
+      transition: border-color 0.05s;
     }
     .tile.filled  { border-color: #888; }
     .tile.correct { background: var(--green);  border-color: var(--green);  color: #fff; }
@@ -142,7 +201,7 @@
     .shake { animation: shake 0.45s ease; }
     @keyframes shake {
       0%,100%{transform:translateX(0)} 20%{transform:translateX(-5px)}
-      40%{transform:translateX(5px)}  60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+      40%{transform:translateX(5px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
     }
     .tile.bounce { animation: bounce 0.5s ease forwards; }
     @keyframes bounce {
@@ -150,7 +209,7 @@
       70%{transform:translateY(-8px)} 100%{transform:translateY(0)}
     }
 
-    /* KEYBOARD */
+    /* ── KEYBOARD ── */
     #keyboard {
       display: flex; flex-direction: column; gap: 6px;
       align-items: center; width: 100%; padding: 0 10px; max-width: 580px;
@@ -171,7 +230,7 @@
     .key.absent  { background: var(--absent); }
     @media (max-width: 360px) { #keyboard{padding:0 8px} .kb-row{gap:3px} .key{height:42px} }
 
-    /* TOAST */
+    /* ── TOAST ── */
     #toast {
       position: fixed; top: 90px; left: 50%;
       transform: translateX(-50%) translateY(-8px);
@@ -182,12 +241,12 @@
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* RESULT PANEL */
+    /* ── RESULT PANEL ── */
     #result {
       display: none; flex-direction: column; align-items: center; gap: 10px;
       background: var(--surface); border: 2px solid var(--gold); border-radius: 14px;
       padding: 22px 28px; text-align: center; animation: fadeUp 0.35s ease;
-      width: 100%; max-width: 360px; margin: 0 auto;
+      width: 100%; max-width: 360px;
     }
     #result.show { display: flex; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -208,7 +267,7 @@
     .btn-lb { background: rgba(240,192,64,0.1); color: var(--gold); border-color: var(--gold); }
     .btn-lb:hover { background: rgba(240,192,64,0.2); }
 
-    /* MODALS */
+    /* ── MODALS ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
       z-index: 300; align-items: center; justify-content: center; padding: 20px;
@@ -233,20 +292,20 @@
     .ex-tile.empty   { background: var(--tile-empty); }
     .ex-label { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
 
-    /* LEADERBOARD TABLE */
+    /* Leaderboard */
     .lb-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
     .lb-table th { color: var(--gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left; }
     .lb-table td { padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
     .lb-table tr.you-row td { color: #8aabff; font-weight: 700; }
     .lb-no-config { text-align: center; padding: 20px; color: var(--text-dim); font-size: 0.85rem; line-height: 1.7; }
 
-    /* NAME INPUT */
+    /* Name input */
     .name-form { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
     .name-form p { color: var(--text-dim); font-size: 0.85rem; }
     .name-input { background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 1rem; width: 100%; outline: none; font-family: inherit; }
     .name-input:focus { border-color: var(--gold); }
 
-    /* CATEGORY */
+    /* ── CATEGORY ── */
     .cat-bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 2px 6px; width: 100%; }
     .cat-pill {
       background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.18);
@@ -258,7 +317,7 @@
     .cat-pill.active { background: var(--red); border-color: var(--gold); color: var(--gold); }
     .cat-section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer { width: 100%; padding: 16px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); margin-top: auto; }
     footer p { font-size: 0.72rem; color: rgba(255,255,255,0.3); line-height: 1.5; max-width: 500px; margin: 0 auto; }
   </style>
@@ -294,8 +353,7 @@
   </div>
 
   <!-- Game area -->
-  <div id="game-area" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:28px">
-
+  <div id="game-area" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:14px">
     <div id="cat-section" style="width:100%">
       <div class="cat-section-label" style="margin-bottom:6px">Category</div>
       <div class="cat-bar" id="cat-bar"></div>
@@ -318,9 +376,7 @@
       </div>
     </div>
 
-    <div style="display:flex; justify-content:center; width:100%">
-      <div id="grid"></div>
-    </div>
+    <div id="grid"></div>
 
     <div id="result">
       <h2 id="result-title"></h2>
@@ -403,9 +459,10 @@
 // ================================================================
 //
 //  HOW TO SET UP (free, ~5 min, no card):
-//  1. Go to https://supabase.com → sign up with GitHub → New project
-//  2. Wait ~1 min, then go to SQL Editor (left sidebar)
-//  3. Paste and run this SQL:
+//  1. Go to https://supabase.com → click "Start your project" → sign up with GitHub
+//  2. Click "New project", give it a name, pick a region, set a password → Create
+//  3. Wait ~1 min for it to load, then go to the SQL Editor (left sidebar)
+//  4. Paste and run this SQL to create the scores table:
 //
 //     create table scores (
 //       id bigint generated always as identity primary key,
@@ -420,8 +477,8 @@
 //     alter table scores enable row level security;
 //     create policy "allow all" on scores for all using (true) with check (true);
 //
-//  4. Go to Project Settings → API → copy Project URL + anon public key
-//  5. Paste below and re-upload to GitHub
+//  5. Go to Project Settings → API → copy "Project URL" and "anon public" key
+//  6. Paste them below and re-upload to GitHub
 
 const SUPABASE_URL = null;  // e.g. 'https://etqgfzrzdrxedvhsxjfk.supabase.co'
 const SUPABASE_KEY = null;  // e.g. 'sb_publishable_vLaCPvxW7vQbnau2p8BSDg_QnfcuY6J'
@@ -493,7 +550,7 @@ let gameMode = 'daily', selectedCategory = 'All';
 let answer = '', wordLen = 0, maxGuesses = 6, currentRow = 0, currentInput = '', gameOver = false;
 let letterStatus = {}, hintRevealed = false, guessHistory = [], currentEntry = null, startTime = null;
 
-const WIN_LINES = [
+const WIN_LINES  = [
   { title:"BOOM!",        msg:"Excellent work! You're a true Mythical Beast!" },
   { title:"DINK IT!",     msg:"Dink it and sink it! Perfect guessing!" },
   { title:"WILL IT WIN?", msg:"YES IT WILL! Great Mythical instincts!" },
@@ -644,45 +701,20 @@ function syncKeyboard() {
 // ================================================================
 //  INPUT
 // ================================================================
-document.addEventListener('keydown', (e) => {
-  // If the user is typing in a real input (like your name modal), don't hijack keys
-  const tag = document.activeElement?.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-
-  if (e.ctrlKey || e.altKey || e.metaKey) return;
-
-  const k = e.key.toUpperCase();
-
-  // Prevent browser default behavior:
-  // - Enter "clicking" focused buttons (like your mode tabs)
-  // - Backspace navigating back on some browsers
-  if (k === 'ENTER' || k === 'BACKSPACE' || /^[A-Z]$/.test(k)) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  if (k === 'BACKSPACE') handleKey('⌫');
-  else if (k === 'ENTER') handleKey('ENTER');
-  else if (/^[A-Z]$/.test(k)) handleKey(k);
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.altKey||e.metaKey) return;
+  const k=e.key.toUpperCase();
+  if(k==='BACKSPACE') handleKey('⌫'); else if(k==='ENTER') handleKey('ENTER'); else if(/^[A-Z]$/.test(k)) handleKey(k);
 });
 function handleKey(key) {
   if(gameOver) return;
   if(key==='⌫') deleteLetter(); else if(key==='ENTER') submitGuess(); else if(/^[A-Z]$/.test(key)) addLetter(key);
 }
 function addLetter(letter) {
-  console.log("addLetter", { letter, currentRow, currentInput, wordLen });
-
-  if (currentInput.length >= wordLen) return;
-  currentInput += letter;
-
-  const t = document.getElementById(`tile-${currentRow}-${currentInput.length - 1}`);
-  console.log("tile lookup:", `tile-${currentRow}-${currentInput.length - 1}`, t);
-
-  t.textContent = letter;
-  t.classList.add('filled');
-  t.classList.remove('pop');
-  void t.offsetWidth;
-  t.classList.add('pop');
+  if(currentInput.length>=wordLen) return;
+  currentInput+=letter;
+  const t=document.getElementById(`tile-${currentRow}-${currentInput.length-1}`);
+  t.textContent=letter; t.classList.add('filled'); t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
 }
 function deleteLetter() {
   if(!currentInput.length) return;
@@ -789,20 +821,23 @@ async function sbFetch(path, options={}) {
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', ...(options.headers||{}) }
   });
 }
+
 async function submitScore(guesses, elapsed, won) {
   if(!SUPABASE_URL||!SUPABASE_KEY) return;
   const name=getUsername(); if(!name) return;
   try {
+    // Check if already submitted
     const check = await sbFetch(`scores?daily_index=eq.${getDailyIndex()}&user_id=eq.${getUserId()}&limit=1`);
     const existing = await check.json();
     if(existing.length>0) return;
     await sbFetch('scores', { method:'POST', body: JSON.stringify({ daily_index:getDailyIndex(), user_id:getUserId(), name, guesses:won?guesses:99, elapsed, won, ts:Date.now() }) });
   } catch(e) { console.warn('Score submit failed:',e); }
 }
+
 async function loadLeaderboard() {
   const el=document.getElementById('lb-content');
   if(!SUPABASE_URL||!SUPABASE_KEY){
-    el.innerHTML=`<div class="lb-no-config"><p>🔌 Leaderboard not connected yet.</p><p style="margin-top:8px">Follow the setup instructions in the HTML file to enable it — free, no card needed!</p></div>`;
+    el.innerHTML=`<div class="lb-no-config"><p>🔌 Leaderboard not connected yet.</p><p style="margin-top:8px">Follow the setup instructions in the HTML file to enable it — it's free with no card needed!</p></div>`;
     return;
   }
   el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim)">Loading…</div>';
