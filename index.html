@@ -518,6 +518,52 @@
       color: var(--text-dim);
       align-self: flex-start;
     }
+
+
+    .modal-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ex-row { display: flex; gap: 4px; }
+
+.ex-tile {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  border: 2px solid var(--tile-border);
+  background: var(--tile-empty);
+}
+
+.ex-tile.correct {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.ex-tile.present {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  color: #fff;
+}
+
+.ex-tile.absent {
+  background: var(--absent);
+  border-color: var(--absent);
+  color: #fff;
+}
+
+.ex-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+    
   </style>
 </head>
 <body>
@@ -599,16 +645,54 @@
 </footer>
 
 <div id="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>HOW TO PLAY</h2>
-    <p>Guess the <strong>Mythical/GMM related word</strong> in the given number of tries.</p>
-    <ul>
-      <li>Each guess must use the correct number of letters.</li>
-      <li>Words vary in length. The letter count is shown above.</li>
-      <li>Use the <strong>Hint</strong> for a clue about the word. NOTE: IT USES ONE OF YOUR GUESSES! SO BE CAUTIOUS!</li>
-      <li>After each guess, tiles change color.</li>
-    </ul>
+<div class="modal">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <h2>HOW TO PLAY</h2>
+
+  <p>Guess the <strong>Mythical/GMM related word</strong> in the given number of tries.</p>
+
+  <ul>
+    <li>Each guess must use the correct number of letters.</li>
+    <li>Words vary in length. The letter count is shown above.</li>
+    <li>Use the <strong>Hint</strong> for a clue about the word. (Costs 1 guess!)</li>
+    <li>After each guess, tiles change color:</li>
+  </ul>
+
+  <div class="modal-examples">
+
+    <div>
+      <div class="ex-row">
+        <div class="ex-tile correct">R</div>
+        <div class="ex-tile">H</div>
+        <div class="ex-tile">E</div>
+        <div class="ex-tile">T</div>
+        <div class="ex-tile">T</div>
+      </div>
+      <div class="ex-label"><strong style="color:#538d4e">Green</strong> — right letter, right spot</div>
+    </div>
+
+    <div>
+      <div class="ex-row">
+        <div class="ex-tile">B</div>
+        <div class="ex-tile present">E</div>
+        <div class="ex-tile">A</div>
+        <div class="ex-tile">R</div>
+        <div class="ex-tile">D</div>
+      </div>
+      <div class="ex-label"><strong style="color:#b59f3b">Yellow</strong> — right letter, wrong spot</div>
+    </div>
+
+    <div>
+      <div class="ex-row">
+        <div class="ex-tile">P</div>
+        <div class="ex-tile">L</div>
+        <div class="ex-tile">A</div>
+        <div class="ex-tile absent">I</div>
+        <div class="ex-tile">D</div>
+      </div>
+      <div class="ex-label"><strong style="color:#3a3a3c">Gray</strong> — letter not in the word</div>
+    </div>
+
   </div>
 </div>
 
