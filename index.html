@@ -644,10 +644,26 @@ function syncKeyboard() {
 // ================================================================
 //  INPUT
 // ================================================================
-document.addEventListener('keydown',e=>{
-  if(e.ctrlKey||e.altKey||e.metaKey) return;
-  const k=e.key.toUpperCase();
-  if(k==='BACKSPACE') handleKey('⌫'); else if(k==='ENTER') handleKey('ENTER'); else if(/^[A-Z]$/.test(k)) handleKey(k);
+document.addEventListener('keydown', (e) => {
+  // If the user is typing in a real input (like your name modal), don't hijack keys
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  const k = e.key.toUpperCase();
+
+  // Prevent browser default behavior:
+  // - Enter "clicking" focused buttons (like your mode tabs)
+  // - Backspace navigating back on some browsers
+  if (k === 'ENTER' || k === 'BACKSPACE' || /^[A-Z]$/.test(k)) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  if (k === 'BACKSPACE') handleKey('⌫');
+  else if (k === 'ENTER') handleKey('ENTER');
+  else if (/^[A-Z]$/.test(k)) handleKey(k);
 });
 function handleKey(key) {
   if(gameOver) return;
