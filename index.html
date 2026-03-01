@@ -654,10 +654,19 @@ function handleKey(key) {
   if(key==='⌫') deleteLetter(); else if(key==='ENTER') submitGuess(); else if(/^[A-Z]$/.test(key)) addLetter(key);
 }
 function addLetter(letter) {
-  if(currentInput.length>=wordLen) return;
-  currentInput+=letter;
-  const t=document.getElementById(`tile-${currentRow}-${currentInput.length-1}`);
-  t.textContent=letter; t.classList.add('filled'); t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop');
+  console.log("addLetter", { letter, currentRow, currentInput, wordLen });
+
+  if (currentInput.length >= wordLen) return;
+  currentInput += letter;
+
+  const t = document.getElementById(`tile-${currentRow}-${currentInput.length - 1}`);
+  console.log("tile lookup:", `tile-${currentRow}-${currentInput.length - 1}`, t);
+
+  t.textContent = letter;
+  t.classList.add('filled');
+  t.classList.remove('pop');
+  void t.offsetWidth;
+  t.classList.add('pop');
 }
 function deleteLetter() {
   if(!currentInput.length) return;
