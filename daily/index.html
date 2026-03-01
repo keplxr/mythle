@@ -189,12 +189,15 @@
     .btn-secondary { background: rgba(255,255,255,0.06); border-color: rgba(240,192,64,0.55); }
     .btn-secondary:hover { background: rgba(255,255,255,0.10); }
 
-    /* MODAL */
-    #modal-overlay {
+    /* MODALS */
+    #modal-overlay,
+    #changelog-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
       z-index: 300; align-items: center; justify-content: center; padding: 20px;
     }
-    #modal-overlay.show { display: flex; }
+    #modal-overlay.show,
+    #changelog-overlay.show { display: flex; }
+
     .modal {
       background: var(--surface); border: 2px solid var(--gold); border-radius: 14px;
       padding: 28px 24px; max-width: 420px; width: 100%; position: relative;
@@ -218,6 +221,43 @@
     .ex-tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
     .ex-label { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
 
+    /* DEVLOG */
+    .cl-entry {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .cl-entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .cl-version-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .cl-badge {
+      background: rgba(240,192,64,0.15);
+      border: 1px solid rgba(240,192,64,0.4);
+      color: var(--gold);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .cl-badge.current {
+      background: rgba(83,141,78,0.25);
+      border-color: rgba(83,141,78,0.6);
+      color: #6fcf64;
+    }
+    .cl-date { color: rgba(255,255,255,0.35); font-size: 0.72rem; }
+    .cl-body + .cl-body { margin-top: 8px; }
+    .cl-body {
+      color: rgba(255,255,255,0.72);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
     footer { width: 100%; padding: 16px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); margin-top: auto; }
     footer p { font-size: 0.72rem; color: rgba(255,255,255,0.3); line-height: 1.5; max-width: 500px; margin: 0 auto; }
   </style>
@@ -227,6 +267,7 @@
 <header>
   <h1>MYTHICLE</h1>
   <p>Daily Mythical Wordle</p>
+  <button class="how-to-btn" style="left:16px;" onclick="openChangelog()" title="Devlog">📋</button>
   <button class="how-to-btn" onclick="openModal()" title="How to play">?</button>
   <button class="nav-btn" onclick="goInfinite()" title="Infinite">∞</button>
 </header>
@@ -249,7 +290,7 @@
     </div>
   </div>
 
-  <!-- Game area (hidden when already played) -->
+  <!-- Game area -->
   <div id="game-area" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:14px;">
     <div class="info-bar">
       <span class="badge" id="badge-length">? Letters</span>
@@ -293,7 +334,28 @@
   <p>MYTHICLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett &amp; Link in any way.</p>
 </footer>
 
-<!-- HOW TO PLAY MODAL -->
+<!-- Devlog modal -->
+<div id="changelog-overlay" onclick="closeChangelogOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeChangelog()">×</button>
+    <h2>DEVLOG</h2>
+
+    <!-- ── Add new entries at the top. Move "current" class to the newest. ── -->
+
+    <div class="cl-entry">
+      <div class="cl-version-row">
+        <span class="cl-badge current">March 1, 2026</span>
+        <span class="cl-date">latest</span>
+      </div>
+      <p class="cl-body">Added this new devlog! Thank you to everyone who has expressed interest in this game, it is greatly appreciated. (Also sorry that theres a new daily word, any update makes there be a new word).</p>
+      <p class="cl-body">For what is being changed, I am currently working on adding more categories and words. So be on the look out for that!</p>
+      <p class="cl-body">Stay tuned for more updates! - Keplxr</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- How to play modal -->
 <div id="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">×</button>
@@ -344,7 +406,7 @@
 <script>
 /* ── WORD LIST ── */
 const WORDS = [
- { word:"LINK", cat:"People",   hint:"Thought to be a beautiful butch woman" },
+  { word:"LINK", cat:"People",   hint:"Thought to be a beautiful butch woman" },
   { word:"WILL", cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment" },
   { word:"DINK", cat:"Culture",  hint:"___ it and sink it!" },
   { word:"SINK", cat:"Culture",  hint:"Dink it and ___ it!" },
@@ -355,7 +417,6 @@ const WORDS = [
   { word:"BECOMING", cat:"Culture",  hint:"I think I'm ____ bi!" },
   { word:"OCD", cat:"Culture",  hint:"It's my ____!" },
   { word:"BACON", cat:"People",   hint:"____ bot just wants you to rub some bacon on it!" },
-
   { word:"RHETT", cat:"People",   hint:"The tall one with the beard" },
   { word:"BEARD", cat:"Style",    hint:"Rhett's most iconic facial feature" },
   { word:"AVIATORS", cat:"Style",    hint:"The glasses Link wears" },
@@ -368,8 +429,7 @@ const WORDS = [
   { word:"DONUT", cat:"Food",     hint:"Will it ___?" },
   { word:"SEAN", cat:"People",   hint:"The dog that is also a drummer" },
   { word:"BARBARA", cat:"People",   hint:"Rhett's dog that loves to escape" },
-
-  { word:"THIS", cat:"Culture",  hint:"Would you like some of  ___ on your that?" },
+  { word:"THIS", cat:"Culture",  hint:"Would you like some of ___ on your that?" },
   { word:"STEVIE", cat:"People",   hint:"Executive producer who appears on-screen, last name Wynne Levine" },
   { word:"CEREAL", cat:"Food",     hint:"Will it ___?" },
   { word:"COFFEE", cat:"Food",     hint:"Morning brew taste test" },
@@ -377,7 +437,6 @@ const WORDS = [
   { word:"BUTTER", cat:"Food",     hint:"Peanut ___ boys" },
   { word:"TOMATO", cat:"Food",     hint:"A food Link hates" },
   { word:"BEANS", cat:"Food",     hint:"Rhett loves these" },
-
   { word:"SMASH", cat:"Food",     hint:"Will it ___ Burger?" },
   { word:"CHIPS", cat:"Food",     hint:"Will it ___ and Salsa?" },
   { word:"TOAST", cat:"Food",     hint:"Will it ___?" },
@@ -387,12 +446,10 @@ const WORDS = [
   { word:"ENTERTAINMENT", cat:"Mythical",hint:"Mythical ___, their business name" },
   { word:"EPISODE", cat:"Shows",   hint:"Each daily GMM upload is an ___ of the show" },
   { word:"WONDERHOLE", cat:"Mythical",hint:"A show made by Rhett and Link that aired in 2024. Currently has two seasons." },
-
   { word:"SMOOTHIE",  cat:"Food",     hint:"Will it ___? Blended edition" },
   { word:"BISCUITS",  cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
   { word:"SANDWICH",  cat:"Podcast",  hint:"A Hotdog Is a ____" },
-  { word:"Myrtle",  cat:"Podcast",  hint:"Dispatches From _____ Beach" },
-
+  { word:"MYRTLE",    cat:"Podcast",  hint:"Dispatches From _____ Beach" },
   { word:"MYTHICALITY", cat:"Mythical", hint:"Spin the Wheel of ___!" },
 ];
 const seen = new Set();
@@ -422,7 +479,7 @@ function dailyIndexFor(dateISO) {
 function dailyEntryFor(dateISO) { return WORD_LIST[dailyIndexFor(dateISO)]; }
 const DAILY_DATE = parseDateParam() || getLocalISODate();
 
-/* ── STORAGE (once per day) ── */
+/* ── STORAGE ── */
 const STORAGE_KEY = `mythicle_daily_v1_${DAILY_DATE}`;
 function getDailyStorage() {
   try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
@@ -450,7 +507,6 @@ function showAlreadyPlayed(saved) {
   document.getElementById('already-played').classList.add('show');
   document.getElementById('game-area').style.display = 'none';
   document.getElementById('keyboard').style.display  = 'none';
-
   const scoreStr = saved.won
     ? `${DAILY_DATE} • Solved in ${saved.guessCount}/${saved.maxGuesses} • ${formatTime(saved.timeSec)} • Hint: ${saved.hintUsed ? 'Yes' : 'No'}`
     : `${DAILY_DATE} • The word was: ${saved.word} • X/${saved.maxGuesses}`;
@@ -604,8 +660,6 @@ function showResult(won, guessCount) {
     ? `Solved in ${guessCount}/${maxGuesses} • ${formatTime(timeSec)} • Hint: ${hintUsed?'Yes':'No'} • ${DAILY_DATE}`
     : `The word was: ${answer} • ${DAILY_DATE}`;
   document.getElementById('result').classList.add('show');
-
-  // Save so they can't replay today
   const emoji = guessHistory.map(r=>colorsToEmoji(r.colors)).join('\n');
   saveDailyStorage({ won, guessCount, maxGuesses, timeSec, hintUsed, emoji, word:answer });
 }
@@ -614,15 +668,18 @@ function showResult(won, guessCount) {
 let toastTimer;
 function toast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),1600); }
 
-/* ── MODAL ── */
+/* ── MODALS ── */
 function openModal()  { document.getElementById('modal-overlay').classList.add('show'); }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
 function closeModalOutside(e) { if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 
+function openChangelog()  { document.getElementById('changelog-overlay').classList.add('show'); }
+function closeChangelog() { document.getElementById('changelog-overlay').classList.remove('show'); }
+function closeChangelogOutside(e) { if(e.target===document.getElementById('changelog-overlay')) closeChangelog(); }
+
 /* ── SHARING ── */
 function colorsToEmoji(colors){ return colors.map(c=>c==='correct'?'🟩':c==='present'?'🟨':'⬛').join(''); }
 function formatTime(seconds){ const m=Math.floor(seconds/60),s=seconds%60; return m>0?`${m}:${String(s).padStart(2,'0')}`:`${s}s`; }
-
 function dailyLink(){ return `${location.origin}${location.pathname}?d=${encodeURIComponent(DAILY_DATE)}`; }
 
 function buildShareText(saved) {
@@ -665,8 +722,7 @@ function goInfinite(){ window.location.href = "../"; }
 /* ── START ── */
 const saved = getDailyStorage();
 if (saved) {
-  // Already played today — show summary
-  newGame(); // sets up answer/wordLen so sharing works
+  newGame();
   showAlreadyPlayed(saved);
 } else {
   newGame();
