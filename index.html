@@ -180,7 +180,13 @@
     .hint-text  { font-size: 0.92rem; color: rgba(255,255,255,0.85); font-style: italic; }
 
     /* ── GRID ── */
-    #grid { display: flex; flex-direction: column; gap: 5px; }
+    #grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 0 auto;          /* centers the grid block */
+      align-items: center;      /* ensures rows center if they ever differ */
+      }
     .grid-row { display: flex; gap: 5px; }
     .tile {
       --size: 58px;
