@@ -184,10 +184,11 @@
       display: flex;
       flex-direction: column;
       gap: 5px;
-      margin: 0 auto;          /* centers the grid block */
-      align-items: center;      /* ensures rows center if they ever differ */
-      }
+      margin: 0 auto;
+      align-items: center;
+    }
     .grid-row { display: flex; gap: 5px; }
+
     .tile {
       --size: 58px;
       width: var(--size); height: var(--size);
@@ -463,31 +464,8 @@
 // ================================================================
 //  SUPABASE SETUP  —  free leaderboard, no credit card needed
 // ================================================================
-//
-//  HOW TO SET UP (free, ~5 min, no card):
-//  1. Go to https://supabase.com → click "Start your project" → sign up with GitHub
-//  2. Click "New project", give it a name, pick a region, set a password → Create
-//  3. Wait ~1 min for it to load, then go to the SQL Editor (left sidebar)
-//  4. Paste and run this SQL to create the scores table:
-//
-//     create table scores (
-//       id bigint generated always as identity primary key,
-//       daily_index integer not null,
-//       user_id text not null,
-//       name text not null,
-//       guesses integer not null,
-//       elapsed integer not null,
-//       won boolean not null,
-//       ts bigint not null
-//     );
-//     alter table scores enable row level security;
-//     create policy "allow all" on scores for all using (true) with check (true);
-//
-//  5. Go to Project Settings → API → copy "Project URL" and "anon public" key
-//  6. Paste them below and re-upload to GitHub
-
-const SUPABASE_URL = null;  // e.g. 'https://etqgfzrzdrxedvhsxjfk.supabase.co'
-const SUPABASE_KEY = null;  // e.g. 'sb_publishable_vLaCPvxW7vQbnau2p8BSDg_QnfcuY6J'
+const SUPABASE_URL = null;
+const SUPABASE_KEY = null;
 
 // ================================================================
 //  WORD LIST
@@ -680,18 +658,41 @@ function hideDailyDone() {
 //  GRID & KEYBOARD
 // ================================================================
 function buildGrid() {
-  const grid = document.getElementById('grid'); grid.innerHTML='';
-  const vw = Math.min(window.innerWidth,580);
-  const tileSize = Math.max(36, Math.min(62, Math.floor((vw-32-(wordLen-1)*5)/wordLen)));
-  for (let r=0; r<maxGuesses; r++) {
-    const row = document.createElement('div'); row.className='grid-row'; row.id=`row-${r}`;
-    for (let c=0; c<wordLen; c++) {
-      const t = document.createElement('div'); t.className='tile'; t.id=`tile-${r}-${c}`;
-      t.style.cssText=`--size:${tileSize}px;font-size:${Math.round(tileSize*.48)}px`; row.appendChild(t);
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  // ✅ measure the real available width (NOT window.innerWidth)
+  const container = document.getElementById('game-area'); // lives inside main, so this matches reality
+  const cw = Math.min(container.clientWidth, 580);
+
+  const gap = 5;      // matches .grid-row gap
+  const safety = 2;   // tiny buffer for rounding
+
+  const tileSize = Math.max(
+    36,
+    Math.min(
+      62,
+      Math.floor((cw - safety - (wordLen - 1) * gap) / wordLen)
+    )
+  );
+
+  for (let r = 0; r < maxGuesses; r++) {
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    row.id = `row-${r}`;
+
+    for (let c = 0; c < wordLen; c++) {
+      const t = document.createElement('div');
+      t.className = 'tile';
+      t.id = `tile-${r}-${c}`;
+      t.style.cssText = `--size:${tileSize}px;font-size:${Math.round(tileSize * 0.48)}px`;
+      row.appendChild(t);
     }
+
     grid.appendChild(row);
   }
 }
+
 const KB_ROWS=[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['ENTER','Z','X','C','V','B','N','M','⌫']];
 function buildKeyboard() {
   KB_ROWS.forEach((row,i)=>{
@@ -703,6 +704,12 @@ function syncKeyboard() {
   const p={correct:3,present:2,absent:1};
   document.querySelectorAll('.key').forEach(b=>{ const k=b.dataset.key,s=letterStatus[k]; b.className='key'+(k.length>1?' wide':'')+(s?` ${s}`:''); });
 }
+
+// ✅ keep grid centered on rotation/resize
+window.addEventListener('resize', () => {
+  if (answer && !document.getElementById('daily-done').style.display) return;
+  if (answer) buildGrid();
+});
 
 // ================================================================
 //  INPUT
@@ -832,7 +839,6 @@ async function submitScore(guesses, elapsed, won) {
   if(!SUPABASE_URL||!SUPABASE_KEY) return;
   const name=getUsername(); if(!name) return;
   try {
-    // Check if already submitted
     const check = await sbFetch(`scores?daily_index=eq.${getDailyIndex()}&user_id=eq.${getUserId()}&limit=1`);
     const existing = await check.json();
     if(existing.length>0) return;
@@ -868,7 +874,13 @@ async function loadLeaderboard() {
 //  LEADERBOARD MODAL
 // ================================================================
 function openLeaderboard() {
-  if(SUPABASE_URL&&!getUsername()){ openNameModal(()=>{ const s=getDailyState(); if(s) submitScore(s.won?s.guesses:null,s.elapsed,s.won); setTimeout(()=>{ document.getElementById('lb-overlay').classList.add('show'); loadLeaderboard(); },700); }); return; }
+  if(SUPABASE_URL&&!getUsername()){
+    openNameModal(()=>{
+      const s=getDailyState(); if(s) submitScore(s.won?s.guesses:null,s.elapsed,s.won);
+      setTimeout(()=>{ document.getElementById('lb-overlay').classList.add('show'); loadLeaderboard(); },700);
+    });
+    return;
+  }
   document.getElementById('lb-overlay').classList.add('show'); loadLeaderboard();
 }
 function closeLeaderboard(){ document.getElementById('lb-overlay').classList.remove('show'); }
