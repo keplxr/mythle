@@ -197,7 +197,6 @@
     .tile.present { background: var(--yellow); border-color: var(--yellow); color: #fff; }
     .tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
 
-    /* pop on letter entry */
     .tile.pop { animation: pop 0.1s ease; }
     @keyframes pop {
       0%   { transform: scale(1); }
@@ -205,7 +204,6 @@
       100% { transform: scale(1); }
     }
 
-    /* row shake */
     .shake { animation: shake 0.45s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
@@ -215,7 +213,6 @@
       80%     { transform: translateX(5px); }
     }
 
-    /* bounce on win */
     .tile.bounce { animation: bounce 0.5s ease forwards; }
     @keyframes bounce {
       0%   { transform: translateY(0); }
@@ -352,6 +349,13 @@
     .new-game-btn:hover  { background: var(--red-dark); }
     .new-game-btn:active { transform: scale(0.97); }
 
+    /* Secondary button for Share */
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(240,192,64,0.55);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.10); }
+
     /* ── HOW TO PLAY MODAL ── */
     #modal-overlay {
       display: none;
@@ -467,13 +471,6 @@
       color: var(--text-dim);
       align-self: flex-start;
     }
-
-    /* Optional: a subtle secondary button style for Share */
-    .btn-secondary {
-      background: rgba(255,255,255,0.06);
-      border-color: rgba(240,192,64,0.55);
-    }
-    .btn-secondary:hover { background: rgba(255,255,255,0.10); }
   </style>
 </head>
 <body>
@@ -633,19 +630,32 @@ const WORD_LIST = WORDS.filter(w => {
 });
 
 // ──────────────────────────────────────────────
+// SHARED PUZZLE (from URL)
+// Example: ?word=RHETT&cat=People
+// ──────────────────────────────────────────────
+const URL_PARAMS = new URLSearchParams(window.location.search);
+const FORCED_WORD = (URL_PARAMS.get('word') || '').toUpperCase().trim();
+const FORCED_CAT  = (URL_PARAMS.get('cat')  || '').trim();
+
+let forcedEntry = null;
+if (FORCED_WORD) {
+  forcedEntry = WORD_LIST.find(w => w.word === FORCED_WORD) || null;
+}
+
+// ──────────────────────────────────────────────
 // GAME STATE
 // ──────────────────────────────────────────────
 let selectedCategory = 'All';
 let hintRevealed = false;
-let hintUsed = false;        // <-- for sharing
+let hintUsed = false;
 let answer = '';
 let wordLen = 0;
 let maxGuesses = 6;
 let currentRow = 0;
 let currentInput = '';
 let gameOver = false;
-let letterStatus = {};       // letter -> 'correct'|'present'|'absent'
-let guessHistory = [];       // <-- for sharing: [{guess, colors}, ...]
+let letterStatus = {};
+let guessHistory = [];
 
 const WIN_LINES = [
   { title: "BOOM!", msg: "Excellent work! You're a true Mythical Beast!" },
@@ -675,6 +685,11 @@ function buildCategoryBar() {
     btn.title = cat === 'All' ? 'All categories' : `${counts[cat]} word${counts[cat] !== 1 ? 's' : ''}`;
     btn.addEventListener('click', () => {
       if (cat === selectedCategory) return;
+
+      // If you were playing a shared puzzle, clicking categories returns to normal mode
+      forcedEntry = null;
+      window.history.replaceState({}, '', `${location.origin}${location.pathname}`);
+
       selectedCategory = cat;
       document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
@@ -696,7 +711,7 @@ function revealHint() {
   }
 
   hintRevealed = true;
-  hintUsed = true;  // <-- for sharing
+  hintUsed = true;
   maxGuesses--;
 
   const grid = document.getElementById('grid');
@@ -711,16 +726,25 @@ function revealHint() {
 }
 
 // ──────────────────────────────────────────────
-// INIT
+// INIT / NEW GAME
 // ──────────────────────────────────────────────
 function newGame() {
-  const pool = selectedCategory === 'All'
-    ? WORD_LIST
-    : WORD_LIST.filter(w => w.cat === selectedCategory);
+  let pool;
+
+  if (forcedEntry) {
+    // Shared puzzle mode: always the same answer
+    pool = [forcedEntry];
+    selectedCategory = 'All';
+  } else {
+    pool = selectedCategory === 'All'
+      ? WORD_LIST
+      : WORD_LIST.filter(w => w.cat === selectedCategory);
+  }
 
   if (!pool.length) { toast('No words in this category!'); return; }
 
   const entry = pool[Math.floor(Math.random() * pool.length)];
+
   answer       = entry.word;
   wordLen      = answer.length;
   maxGuesses   = 6;
@@ -729,8 +753,8 @@ function newGame() {
   gameOver     = false;
   letterStatus = {};
   hintRevealed = false;
-  hintUsed     = false;   // <-- reset
-  guessHistory = [];      // <-- reset
+  hintUsed     = false;
+  guessHistory = [];
 
   document.getElementById('badge-length').textContent   = `${wordLen} Letters`;
   document.getElementById('badge-cat').textContent      = `Category: ${entry.cat}`;
@@ -855,7 +879,6 @@ function submitGuess() {
 
   const colors = scoreGuess(currentInput, answer);
 
-  // store for sharing
   guessHistory.push({ guess: currentInput, colors: [...colors] });
 
   revealRow(currentRow, colors, currentInput);
@@ -997,7 +1020,7 @@ function closeModalOutside(e) {
 }
 
 // ──────────────────────────────────────────────
-// SHARING
+// SHARING (locked puzzle link)
 // ──────────────────────────────────────────────
 function colorsToEmoji(colors) {
   return colors.map(c => (c === 'correct' ? '🟩' : c === 'present' ? '🟨' : '⬛')).join('');
@@ -1016,8 +1039,8 @@ function buildShareText() {
 
   const grid = guessHistory.map(r => colorsToEmoji(r.colors)).join('\n');
 
-  // If hosted, this will be your actual page URL
-  const playLink = `${location.origin}${location.pathname}`;
+  const playLink =
+    `${location.origin}${location.pathname}?word=${encodeURIComponent(answer)}&cat=${encodeURIComponent(cat)}`;
 
   return `${header}\n${scoreLine}\n${hintLine}\n\n${grid}\n\nPlay: ${playLink}`;
 }
@@ -1044,7 +1067,7 @@ async function shareResult() {
 
     window.prompt('Copy your results:', text);
   } catch (err) {
-    if (String(err).toLowerCase().includes('abort')) return; // user cancelled share sheet
+    if (String(err).toLowerCase().includes('abort')) return;
     window.prompt('Copy your results:', text);
   }
 }
@@ -1053,7 +1076,18 @@ async function shareResult() {
 // START
 // ──────────────────────────────────────────────
 buildCategoryBar();
+
+// If loaded from a shared link, try to highlight that category pill (if it exists)
+if (forcedEntry && FORCED_CAT) {
+  selectedCategory = FORCED_CAT;
+  buildCategoryBar();
+}
+
 newGame();
+
+if (forcedEntry) {
+  toast(`Shared puzzle loaded: ${forcedEntry.word}`);
+}
 </script>
 </body>
 </html>
