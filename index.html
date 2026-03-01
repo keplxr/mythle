@@ -835,18 +835,16 @@ function revealHint() {
   hintRevealed = true;
   maxGuesses--;
 
-  // rebuild grid to match new guess count (cleaner than removing last row)
-  buildGrid();
+  // ✅ remove ONE row without rebuilding everything
+  const grid = document.getElementById('grid');
+  const rows = grid.querySelectorAll('.grid-row');
+  if (rows.length) grid.removeChild(rows[rows.length - 1]);
 
   document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
   document.getElementById('hint-reveal-btn').style.display = 'none';
   document.getElementById('hint-revealed').classList.add('show');
 
-  // restore already-entered rows (if any) after rebuild
-  // (we'll re-apply from saved state in daily, or from runtime buffer below)
-  redrawFromBuffers();
-
-  // save daily state
+  // ✅ save daily state (if daily)
   if (gameMode === 'daily') {
     const saved = loadDailyState() || { guesses: [], colors: [] };
     saveDailyState(buildSavedState(saved.guesses || [], saved.colors || []));
@@ -1096,6 +1094,12 @@ function submitGuess() {
     return;
   }
 
+    // ✅ force the row's letters to exist in the tiles before reveal
+  for (let c = 0; c < wordLen; c++) {
+    const tile = document.getElementById(`tile-${currentRow}-${c}`);
+    tile.textContent = currentInput[c];
+    tile.classList.add('filled');
+  }
   const colors = scoreGuess(currentInput, answer);
   revealRow(currentRow, colors, currentInput);
 
