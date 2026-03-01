@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MYTHLE Daily — Good Mythical Wordle</title>
+  <title>MYTHICLE Daily — Good Mythical Wordle</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -225,7 +225,7 @@
 <body>
 
 <header>
-  <h1>MYTHLE</h1>
+  <h1>MYTHICLE</h1>
   <p>Daily Mythical Wordle</p>
   <button class="how-to-btn" onclick="openModal()" title="How to play">?</button>
   <button class="nav-btn" onclick="goInfinite()" title="Infinite">∞</button>
@@ -290,7 +290,7 @@
 <div id="toast"></div>
 
 <footer>
-  <p>MYTHLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett &amp; Link in any way.</p>
+  <p>MYTHICLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett &amp; Link in any way.</p>
 </footer>
 
 <!-- HOW TO PLAY MODAL -->
@@ -344,33 +344,55 @@
 <script>
 /* ── WORD LIST ── */
 const WORDS = [
-  { word:"LINK", cat:"People",   hint:"Thought to be a beautiful butch woman" },
+ { word:"LINK", cat:"People",   hint:"Thought to be a beautiful butch woman" },
   { word:"WILL", cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment" },
   { word:"DINK", cat:"Culture",  hint:"___ it and sink it!" },
   { word:"SINK", cat:"Culture",  hint:"Dink it and ___ it!" },
   { word:"JOSH", cat:"People",   hint:"The host of Mythical Kitchen" },
   { word:"GOOD", cat:"Shows",    hint:"___ Mythical Morning" },
+  { word:"BEAST", cat:"Culture",    hint:"Mythical ____, the name of the fans" },
+  { word:"EVENING", cat:"Shows",    hint:"Good Mythical _____, their yearly adult show" },
+  { word:"BECOMING", cat:"Culture",  hint:"I think I'm ____ bi!" },
+  { word:"OCD", cat:"Culture",  hint:"It's my ____!" },
+  { word:"BACON", cat:"People",   hint:"____ bot just wants you to rub some bacon on it!" },
+
   { word:"RHETT", cat:"People",   hint:"The tall one with the beard" },
   { word:"BEARD", cat:"Style",    hint:"Rhett's most iconic facial feature" },
+  { word:"AVIATORS", cat:"Style",    hint:"The glasses Link wears" },
   { word:"WHEEL", cat:"Segments", hint:"___ of Mythicality" },
   { word:"TASTE", cat:"Segments", hint:"___ test, a staple segment." },
+  { word:"GAME", cat:"Segments", hint:"Are you a ____ in the Dark?" },
   { word:"CHILI", cat:"Food",     hint:"Will it ___?" },
   { word:"WEIRD", cat:"Culture",  hint:"Embracing the unusual is Mythical's whole brand" },
   { word:"CANDY", cat:"Food",     hint:"Cotton ___ Randy" },
   { word:"DONUT", cat:"Food",     hint:"Will it ___?" },
+  { word:"SEAN", cat:"People",   hint:"The dog that is also a drummer" },
+  { word:"BARBARA", cat:"People",   hint:"Rhett's dog that loves to escape" },
+
+  { word:"THIS", cat:"Culture",  hint:"Would you like some of  ___ on your that?" },
   { word:"STEVIE", cat:"People",   hint:"Executive producer who appears on-screen, last name Wynne Levine" },
   { word:"CEREAL", cat:"Food",     hint:"Will it ___?" },
   { word:"COFFEE", cat:"Food",     hint:"Morning brew taste test" },
   { word:"JORDAN", cat:"People",   hint:"Mythical crew member, last name Morris" },
   { word:"BUTTER", cat:"Food",     hint:"Peanut ___ boys" },
+  { word:"TOMATO", cat:"Food",     hint:"A food Link hates" },
+  { word:"BEANS", cat:"Food",     hint:"Rhett loves these" },
+
+  { word:"SMASH", cat:"Food",     hint:"Will it ___ Burger?" },
+  { word:"CHIPS", cat:"Food",     hint:"Will it ___ and Salsa?" },
+  { word:"TOAST", cat:"Food",     hint:"Will it ___?" },
   { word:"MORNING", cat:"Shows",   hint:"Good Mythical ___" },
   { word:"KITCHEN", cat:"Shows",   hint:"Mythical ___ with Chef Josh" },
   { word:"SOCIETY", cat:"Mythical",hint:"Mythical ___, their fan membership club" },
+  { word:"ENTERTAINMENT", cat:"Mythical",hint:"Mythical ___, their business name" },
   { word:"EPISODE", cat:"Shows",   hint:"Each daily GMM upload is an ___ of the show" },
-  { word:"MYTHICAL",  cat:"Mythical", hint:"The brand, the company, the lifestyle — it's all ___" },
-  { word:"SANDWICH",  cat:"Food",     hint:"A Hotdog Is a ____, a podcast" },
+  { word:"WONDERHOLE", cat:"Mythical",hint:"A show made by Rhett and Link that aired in 2024. Currently has two seasons." },
+
   { word:"SMOOTHIE",  cat:"Food",     hint:"Will it ___? Blended edition" },
   { word:"BISCUITS",  cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
+  { word:"SANDWICH",  cat:"Podcast",  hint:"A Hotdog Is a ____" },
+  { word:"Myrtle",  cat:"Podcast",  hint:"Dispatches From _____ Beach" },
+
   { word:"MYTHICALITY", cat:"Mythical", hint:"Spin the Wheel of ___!" },
 ];
 const seen = new Set();
@@ -401,7 +423,7 @@ function dailyEntryFor(dateISO) { return WORD_LIST[dailyIndexFor(dateISO)]; }
 const DAILY_DATE = parseDateParam() || getLocalISODate();
 
 /* ── STORAGE (once per day) ── */
-const STORAGE_KEY = `mythle_daily_v1_${DAILY_DATE}`;
+const STORAGE_KEY = `mythicle_daily_v1_${DAILY_DATE}`;
 function getDailyStorage() {
   try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; } catch { return null; }
 }
@@ -607,7 +629,7 @@ function buildShareText(saved) {
   const entry=WORD_LIST.find(w=>w.word===answer)||WORD_LIST[dailyIndexFor(DAILY_DATE)];
   const cat=entry?entry.cat:'Daily';
   const wl=saved?saved.word.length:wordLen;
-  const header=`MYTHLE Daily — ${DAILY_DATE} • ${cat} • ${wl} letters`;
+  const header=`MYTHICLE Daily — ${DAILY_DATE} • ${cat} • ${wl} letters`;
   let scoreLine, emojiGrid;
   if(saved){
     scoreLine=saved.won?`Score: ${saved.guessCount}/${saved.maxGuesses} • ${formatTime(saved.timeSec)} • Hint: ${saved.hintUsed?'Yes':'No'}`:`Score: X/${saved.maxGuesses}`;
@@ -631,7 +653,7 @@ async function shareStored() {
 }
 async function doShare(text) {
   try {
-    if(navigator.share){ await navigator.share({title:'MYTHLE Daily',text}); return; }
+    if(navigator.share){ await navigator.share({title:'MYTHICLE Daily',text}); return; }
     if(navigator.clipboard&&window.isSecureContext){ await navigator.clipboard.writeText(text); toast('Copied to clipboard!'); return; }
     window.prompt('Copy your results:',text);
   } catch(err){ if(!String(err).toLowerCase().includes('abort')) window.prompt('Copy your results:',text); }
