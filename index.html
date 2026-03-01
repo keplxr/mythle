@@ -745,13 +745,32 @@ function syncKeyboard() {
 // ================================================================
 //  INPUT
 // ================================================================
-document.addEventListener('keydown',e=>{
-  if(e.ctrlKey||e.altKey||e.metaKey) return;
-  const k=e.key.toUpperCase();
-  if(k==='BACKSPACE') handleKey('⌫');
-  else if(k==='ENTER') handleKey('ENTER');
-  else if(/^[A-Z]$/.test(k)) handleKey(k);
-});
+document.addEventListener('keydown', (e) => {
+  // If the name modal is open, let the user type normally
+  const nameOpen = document.getElementById('name-overlay')?.classList.contains('show');
+  if (nameOpen) return;
+
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+  const k = e.key.toUpperCase();
+  const isLetter = /^[A-Z]$/.test(k);
+  const isEnter = (k === 'ENTER');
+  const isBackspace = (k === 'BACKSPACE');
+  const isSpace = (k === ' ' || k === 'SPACEBAR'); // some browsers report space differently
+
+  // We handle these keys ourselves, so stop the browser from "clicking" focused buttons.
+  if (isLetter || isEnter || isBackspace || isSpace) {
+    e.preventDefault();
+
+    // If a button is focused (category pill / tab / hint button), blur it so Enter won't activate it.
+    const ae = document.activeElement;
+    if (ae && ae.tagName === 'BUTTON') ae.blur();
+  }
+
+  if (isBackspace) handleKey('⌫');
+  else if (isEnter) handleKey('ENTER');
+  else if (isLetter) handleKey(k);
+});;
 
 function handleKey(key) {
   if(gameOver) return;
