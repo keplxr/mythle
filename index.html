@@ -633,6 +633,9 @@
     <h2 id="result-title"></h2>
     <p id="result-msg"></p>
     <div class="answer-display" id="result-answer"></div>
+     <div id="result-word-info" style="font-size:0.82rem; color:rgba(255,255,255,0.6); font-style:italic;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 14px;
+      width:100%; text-align:center;"></div>
 
     <div class="lb" id="lb-wrap">
       <div class="lb-title">
@@ -684,7 +687,7 @@
       </div>
       <p class="cl-body">Added over 40 new words and 2 new categories!</p>
       <p class="cl-body">I added as many things as I can currently think of, when more comes to me I will add it.</p>
-      <p class="cl-body">Until then, enjoy your 88 words - Keplxr</p>
+      <p class="cl-body">Until then, enjoy your 86 words - Keplxr</p>
     </div>
 
   </div>
@@ -746,7 +749,7 @@
 // ──────────────────────────────────────────────
 const WORDS = [
   { word:"LINK",          cat:"People",   hint:"Thought to be a beautiful butch woman" },
-  { word:"CHICA",          cat:"People",   hint:"Topo ____, Link's drag persona" },
+  { word:"CHICA",          cat:"People",   hint:"Topo ____, Link's drag persona", quote:"Topo Chica" },
   { word:"WHETT",          cat:"People",   hint:"____, Rhett's drag persona" },
   { word:"RHETT",         cat:"People",   hint:"The tall one with the beard" },
   { word:"JOSH",          cat:"People",   hint:"The host of Mythical Kitchen" },
@@ -754,97 +757,95 @@ const WORDS = [
   { word:"JORDAN",        cat:"People",   hint:"Mythical crew member, last name Morris" },
   { word:"SEAN",          cat:"People",   hint:"The dog that is also a drummer" },
   { word:"BARBARA",       cat:"People",   hint:"Rhett's dog that loves to escape" },
-  { word:"ZEBRA",         cat:"People",   hint:"Dope ___" },
+  { word:"ZEBRA",         cat:"People",   hint:"Dope ___", quote:"Dope Zebra" },
   { word:"BELVEDERE",     cat:"People",   hint:"God, also a cockatrice" },
   { word:"CHASE",         cat:"People",   hint:"Mythical crew member, last name Hilt" },
   { word:"DAVIN",         cat:"People",   hint:"Mythical crew member, last name Tjen" },
-  { word:"COTTON",        cat:"People",   hint:"___ Candy Randy" },
+  { word:"COTTON",        cat:"People",   hint:"___ Candy Randy", quote:"Cotton Candy Randy" },
   { word:"CARNEY",        cat:"People",   hint:"Mythical crew member, first name Matt" },
   { word:"EMILY", cat:"People", hint:"Mythical crew member, last name Fleming" },
-  { word:"HILT", cat:"People", hint:"Chase's last name" },
   { word:"MOOCHELLE", cat:"People", hint:"Anthropomorphic cow, was eventually killed" },
 
   // ── Culture ──
-  { word:"DINK",          cat:"Culture and Quotes",  hint:"___ it and sink it!" },
-  { word:"SINK",          cat:"Culture and Quotes",  hint:"Dink it and ___ it!" },
-  { word:"BEAST",         cat:"Culture and Quotes",  hint:"Mythical ____, the name of the fans" },
-  { word:"BECOMING",      cat:"Culture and Quotes",  hint:"I think I'm ____ bi!" },
-  { word:"THIS",          cat:"Culture and Quotes",  hint:"Would you like some of ___ on your that?" },
-  { word:"CHIA",          cat:"Culture and Quotes",  hint:"___ Lincoln, the centerpiece of Rhett and Link's morning show before GMM" },
-  { word:"LTAT",          cat:"Culture and Quotes",  hint:"Abbreviation for 'Let's Talk About That', a GMM spinoff show" },
-  { word:"FAJITAS",          cat:"Culture and Quotes",  hint:"When the ____ come out sizzling!" },
-  { word:"MYTHICON", cat:"Culture and Quotes", hint:"The Mythical fan convention" },
-  { word:"CREEK", cat:"Culture and Quotes", hint:"The Lost Causes of Bleak ___" },
-  { word:"BLEAK", cat:"Culture and Quotes", hint:"The Lost Causes of ____ Creek" },
-  { word:"TOKYO",          cat:"Culture and Quotes",  hint:"WHAAAAATTTTT?" },
-  { word:"COCKATRICE", cat:"Culture and Quotes", hint:"Belvedere is one" },
-  { word:"NORTH",          cat:"Culture and Quotes",  hint:"___ Carolina, the state Rhett and Link are from" },
-  { word:"RANDLER", cat:"Culture and Quotes", hint:"The mythical creature based on Rhett and Link's initials" },
+  { word:"DINK",          cat:"Culture & Quotes",  hint:"___ it and sink it!", quote:"Dink it and Sink it!"  },
+  { word:"SINK",          cat:"Culture & Quotes",  hint:"Dink it and ___ it!", quote:"Dink it and Sink it!"  },
+  { word:"BEAST",         cat:"Culture & Quotes",  hint:"Mythical ____, the name of the fans", quote:"A Mythical Beast! An amazing name for a fan."  },
+  { word:"BECOMING",      cat:"Culture & Quotes",  hint:"I think I'm ____ bi!", quote:"I think I'm becoming bi!"  },
+  { word:"THIS",          cat:"Culture & Quotes",  hint:"Would you like some of ___ on your that?", quote:"Would you like some of this on your that?"  },
+  { word:"CHIA",          cat:"Culture & Quotes",  hint:"___ Lincoln, the centerpiece of Rhett and Link's morning show before GMM", quote:"Chia Lincoln"  },
+  { word:"LTAT",          cat:"Culture & Quotes",  hint:"Abbreviation for 'Let's Talk About That', a GMM spinoff show" },
+  { word:"FAJITAS",          cat:"Culture & Quotes",  hint:"When the ____ come out sizzling!", quote:"When the fajitas cpme out sizzling!"  },
+  { word:"MYTHICON", cat:"Culture & Quotes", hint:"The Mythical fan convention" },
+  { word:"CREEK", cat:"Culture & Quotes", hint:"The Lost Causes of Bleak ___", quote:"Bleak Creek"  },
+  { word:"BLEAK", cat:"Culture & Quotes", hint:"The Lost Causes of ____ Creek", quote:"Bleak Creek"  },
+  { word:"TOKYO",          cat:"Culture & Quotes",  hint:"WHAAAAATTTTT?", quote:"WHHHAAATTTTTT?"  },
+  { word:"COCKATRICE", cat:"Culture & Quotes", hint:"Belvedere is one" },
+  { word:"NORTH",          cat:"Culture & Quotes",  hint:"___ Carolina, the state Rhett and Link are from", quote:"North Carolina"  },
+  { word:"RANDLER", cat:"Culture & Quotes", hint:"The mythical creature based on Rhett and Link's initials" },
 
   // ── Songs ──
-  { word:"OCD",           cat:"Songs",    hint:"It's my ____!" },
-  { word:"FOG",           cat:"Songs",    hint:"Rhett and Link chase this" },
-  { word:"BACON",         cat:"Songs",    hint:"____ bot just wants you to rub some bacon on it!" },
-  { word:"NERD",          cat:"Songs",    hint:"___ vs. Geek, a rap battle" },
-  { word:"BELLY",         cat:"Songs",    hint:"It's my ____ button" },
-  { word:"VACATION",      cat:"Songs",    hint:"Everything's okay 'cause I'm on ______" },
-  { word:"NILLA",         cat:"Songs",    hint:"The wafer used to make this top hat" },
-  { word:"PHAT",          cat:"Songs",    hint:"___dippin'" },
-  { word:"FACEBOOK",      cat:"Songs",    hint:"Rhett & Link's parody song about the social network" },
-  { word:"EPIC",          cat:"Songs",    hint:"___ Rap Battle — Rhett & Link's musical battle series" },
-  { word:"HERE",           cat:"Songs",    hint:"You Are ____" },
-  { word:"HONEST",           cat:"Songs",    hint:"Just Being ____, a song where Rhett and Link tell the truth" },
-  { word:"WHALE",          cat:"Songs",    hint:"It's gonna die no matter if you use paper or plastic" },
+  { word:"OCD",           cat:"Songs",    hint:"It's my ____!", quote:"It's my OCD!"  },
+  { word:"FOG",           cat:"Songs",    hint:"Rhett and Link chase this", quote:"Fog Chasers"  },
+  { word:"BACON",         cat:"Songs",    hint:"____ bot just wants you to rub some bacon on it!", quote:"Bacon bot"  },
+  { word:"NERD",          cat:"Songs",    hint:"___ vs. Geek, a rap battle", quote:"Nerd vs. Geek"  },
+  { word:"BELLY",         cat:"Songs",    hint:"It's my ____ button", quote:"It's my belly button"  },
+  { word:"VACATION",      cat:"Songs",    hint:"Everything's okay 'cause I'm on ______", quote:"We spent 14 hours on that sand castle!"  },
+  { word:"NILLA",         cat:"Songs",    hint:"The wafer used to make this top hat", quote:"Nilla Wafer Top Hat Time"  },
+  { word:"PHAT",          cat:"Songs",    hint:"___dippin'", quote:"Phatdippin'"  },
+  { word:"FACEBOOK",      cat:"Songs",    hint:"Rhett & Link's parody song about the social network", quote:"The Facebook Song"  },
+  { word:"EPIC",          cat:"Songs",    hint:"___ Rap Battle. Rhett and Link's musical battle series", quote:"Epic Rap Battle series"  },
+  { word:"HERE",           cat:"Songs",    hint:"You Are ____", quote:"We're not queer, but to be clear, we are supportive"  },
+  { word:"HONEST",           cat:"Songs",    hint:"Just Being ____, a song where Rhett and Link tell the truth", quote:"Honesty means that much to me"  },
+  { word:"WHALE",          cat:"Songs",    hint:"It's gonna die no matter if you use paper or plastic", quote:"A whale is gonna die"  },
 
   // ── Segments ──
-  { word:"WILL",          cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment" },
-  { word:"WHEEL",         cat:"Segments", hint:"___ of Mythicality" },
-  { word:"TASTE",         cat:"Segments", hint:"___ test, a staple segment" },
-  { word:"GAME",          cat:"Segments", hint:"Are you a ____ in the Dark?" },
-  { word:"BLIND",         cat:"Segments", hint:"___ taste test, no peeking allowed" },
-  { word:"NEW",         cat:"Segments", hint:"___ Tool v.s. Old School" },
-  { word:"OLD",         cat:"Segments", hint:"New Tool v.s. ____ School" },
-  { word:"SCORN",         cat:"Segments", hint:"___hole, corn hole of the least liked items" },
-  { word:"DARTS", cat:"Segments", hint:"International Taste Test uses ___" },
-  { word:"FROZEN", cat:"Segments", hint:"____ vs. Fast vs. Fancy" },
-  { word:"FAST", cat:"Segments", hint:"Frozen vs. ____ vs. Fancy" },
-  { word:"FANCY", cat:"Segments", hint:"Frozen vs. Fast vs. ____" },
+  { word:"WILL",          cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment", quote:"Will It?" },
+  { word:"WHEEL",         cat:"Segments", hint:"___ of Mythicality", quote:"Wheel of Mythicality!" },
+  { word:"TASTE",         cat:"Segments", hint:"___ test, a staple segment", quote:"Taste Test" },
+  { word:"GAME",          cat:"Segments", hint:"Are you a ____ in the Dark?", quote:"Are you a Game in the Dark?" },
+  { word:"BLIND",         cat:"Segments", hint:"___ taste test, no peeking allowed", quote:"Blind Taste Test" },
+  { word:"NEW",         cat:"Segments", hint:"___ Tool or Old School", quote:"New Tool or Old School?" },
+  { word:"OLD",         cat:"Segments", hint:"New Tool or ____ School", quote:"New Tool or Old School?" },
+  { word:"SCORN",         cat:"Segments", hint:"___hole, corn hole of the least liked items", quote:"Scornhole" },
+  { word:"DARTS", cat:"Segments", hint:"International Taste Test uses ___", quote:"Used in International Taste Tests" },
+  { word:"FROZEN", cat:"Segments", hint:"____ vs. Fast vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"FAST", cat:"Segments", hint:"Frozen vs. ____ vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"FANCY", cat:"Segments", hint:"Frozen vs. Fast vs. ____", quote:"Frozen vs. Fast vs. Fancy" },
 
   // ── Food ──
-  { word:"CHILI",         cat:"Food",     hint:"Will it ___?" },
-  { word:"DONUT",         cat:"Food",     hint:"Will it ___?" },
-  { word:"CEREAL",        cat:"Food",     hint:"Will it ___?" },
-  { word:"BUTTER",        cat:"Food",     hint:"Peanut ___ boys" },
+  { word:"CHILI",         cat:"Food",     hint:"Will it ___?", quote:"Will it Chili?" },
+  { word:"DONUT",         cat:"Food",     hint:"Will it ___?", quote:"Will it Donut?" },
+  { word:"CEREAL",        cat:"Food",     hint:"Will it ___?", quote:"Will it Cereal?" },
+  { word:"BUTTER",        cat:"Food",     hint:"Peanut ___ boys", quote:"Peanutbutter boys" },
   { word:"TOMATO",        cat:"Food",     hint:"A food Link hates" },
   { word:"BEANS",         cat:"Food",     hint:"Rhett loves these" },
-  { word:"SMASH",         cat:"Food",     hint:"Will it ___ Burger?" },
-  { word:"CHIPS",         cat:"Food",     hint:"Will it ___ and Salsa?" },
-  { word:"TOAST",         cat:"Food",     hint:"Will it ___?" },
-  { word:"SMOOTHIE",      cat:"Food",     hint:"Will it ___? Blended edition" },
-  { word:"WAFFLE",        cat:"Food",     hint:"Will it ___? Breakfast edition" },
-  { word:"SLUSHIE",         cat:"Food",     hint:"Will it ___?" },
-  { word:"UNCRUSTABLE",         cat:"Food",     hint:"Will it ___?" },
-  { word:"CALZONE",          cat:"Food",     hint:"Will it ___?" },
-  { word:"SUB",         cat:"Food",     hint:"Will it ___?" },
-  { word:"RAVIOLI",         cat:"Food",     hint:"Will it ___?" },
-  { word:"BROWNIE",         cat:"Food",     hint:"Will it ___?" },
-  { word:"FRIES",        cat:"Food",     hint:"Will it ___?" },
-  { word:"QUESADILLA",        cat:"Food",     hint:"Will it ___?" },
-  { word:"TAQUITO",         cat:"Food",     hint:"Will it ___?" },
+  { word:"SMASH",         cat:"Food",     hint:"Will it ___ Burger?", quote:"Will it Smash Burger?" },
+  { word:"CHIPS",         cat:"Food",     hint:"Will it ___ and Salsa?", quote:"Will it Chips and Salsa?" },
+  { word:"TOAST",         cat:"Food",     hint:"Will it ___?", quote:"Will it Toast?" },
+  { word:"SMOOTHIE",      cat:"Food",     hint:"Will it ___? Blended edition", quote:"Will it Smoothie?" },
+  { word:"WAFFLE",        cat:"Food",     hint:"Will it ___? Breakfast edition", quote:"Will it Waffle?" },
+  { word:"SLUSHIE",         cat:"Food",     hint:"Will it ___?", quote:"Will it Slushie?" },
+  { word:"UNCRUSTABLE",         cat:"Food",     hint:"Will it ___?", quote:"Will it Uncrustable?" },
+  { word:"CALZONE",          cat:"Food",     hint:"Will it ___?", quote:"Will it Calzone?" },
+  { word:"SUB",         cat:"Food",     hint:"Will it ___?", quote:"Will it Sub?" },
+  { word:"RAVIOLI",         cat:"Food",     hint:"Will it ___?", quote:"Will it Ravioli?" },
+  { word:"BROWNIE",         cat:"Food",     hint:"Will it ___?", quote:"Will it Brownie?" },
+  { word:"FRIES",        cat:"Food",     hint:"Will it ___?", quote:"Will it Fries?" },
+  { word:"QUESADILLA",        cat:"Food",     hint:"Will it ___?", quote:"Will it Quesadilla?" },
+  { word:"TAQUITO",         cat:"Food",     hint:"Will it ___?", quote:"Will it Taquito?" },
 
   // ── Shows ──
-  { word:"GOOD",          cat:"Shows",    hint:"___ Mythical Morning" },
-  { word:"EVENING",       cat:"Shows",    hint:"Good Mythical _____, their yearly adult show" },
+  { word:"GOOD",          cat:"Shows",    hint:"___ Mythical Morning", quote:"Good Mythical Morning" },
+  { word:"EVENING",       cat:"Shows",    hint:"Good Mythical _____, their yearly adult show", quote:"Good Mythical Evening" },
   { word:"KITCHEN",       cat:"Shows",    hint:"Mythical ___ with Chef Josh" },
-  { word:"EPISODE",       cat:"Shows",    hint:"Each daily GMM upload is an ___ of the show" },
   { word:"WONDERHOLE",    cat:"Shows",    hint:"A show made by Rhett and Link that aired in 2024. Currently has two seasons." },
-  { word:"BUDDY",         cat:"Shows",    hint:"____ System, a comedy series Rhett and Link made in 2016" },
-  { word:"MORE",        cat:"Shows",    hint:"The after-show that follows GMM, Good Mythical ___" },
+  { word:"BUDDY",         cat:"Shows",    hint:"____ System, a comedy series Rhett and Link made in 2016", quote:"Buddy System" },
+  { word:"MORE",        cat:"Shows",    hint:"The after-show that follows GMM, Good Mythical ___", quote:"Good Mythical More" },
 
   // ── Podcast ──
-  { word:"BISCUITS",      cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
-  { word:"SANDWICH",      cat:"Podcast",  hint:"A Hotdog Is a ____" },
-  { word:"MYRTLE",        cat:"Podcast",  hint:"Dispatches From _____ Beach" },
+  { word:"BISCUITS",      cat:"Podcast",  hint:"Ear ___, their long-running podcast", quote:"Ear Biscuits" },
+  { word:"SANDWICH",      cat:"Podcast",  hint:"A Hotdog Is a ____", quote:"A Hotdog Is a Sandwich" },
+  { word:"MYRTLE",        cat:"Podcast",  hint:"Dispatches From _____ Beach", quote:"Dispatches From Myrtle Beach" },
 ];
 
 const seen = new Set();
@@ -1249,6 +1250,9 @@ function showResult(won, guessCount) {
 
   const lastName = localStorage.getItem('mythicle_player_name') || '';
   document.getElementById('lb-name').value = lastName;
+
+  const entry = WORD_LIST.find(w => w.word.toUpperCase() === answer);
+  document.getElementById('result-word-info').textContent = entry?.quote ? `"${entry.quote}"` : '';
 
   renderLeaderboard();
   document.getElementById('result').classList.add('show');
