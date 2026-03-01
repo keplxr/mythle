@@ -641,7 +641,7 @@
 <div id="toast"></div>
 
 <footer>
-  <p>MYTHLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett & Link in any way.</p>
+  <p>MYTHICLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett & Link in any way.</p>
 </footer>
 
 <div id="modal-overlay" onclick="closeModalOutside(event)">
@@ -769,7 +769,7 @@ function b64urlDecode(str) {
   return decodeURIComponent(escape(atob(base64)));
 }
 
-const OBF_KEY = "MYTHLE-KEY-01";
+const OBF_KEY = "MYTHICLE-KEY-01";
 function xorObfuscate(plain) {
   let out = '';
   for (let i = 0; i < plain.length; i++) {
@@ -1171,7 +1171,7 @@ function showResult(won, guessCount) {
   form.classList.toggle('show', won); // only allow submit if you won
 
   // preload name (remembered)
-  const lastName = localStorage.getItem('mythle_player_name') || '';
+  const lastName = localStorage.getItem('mythicle_player_name') || '';
   document.getElementById('lb-name').value = lastName;
 
   renderLeaderboard();
@@ -1227,7 +1227,7 @@ function buildShareText() {
   const elapsedSec = Math.max(0, Math.round(((finishedAtMs || Date.now()) - startedAtMs) / 1000));
   const timeStr = formatTime(elapsedSec);
 
-  const header = `MYTHLE — ${cat} • ${wordLen} letters`;
+  const header = `MYTHICLE — ${cat} • ${wordLen} letters`;
   const scoreLine = won ? `Score: ${guessCount}/${maxGuesses} • Time: ${timeStr} • Hint: ${hintUsed ? 'Yes' : 'No'}` : `Score: X/${maxGuesses}`;
   const grid = guessHistory.map(r => colorsToEmoji(r.colors)).join('\n');
 
@@ -1239,7 +1239,7 @@ async function shareResult() {
   const text = buildShareText();
 
   try {
-    if (navigator.share) { await navigator.share({ title: 'MYTHLE', text }); return; }
+    if (navigator.share) { await navigator.share({ title: 'MYTHICLE', text }); return; }
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
       toast('Copied to clipboard!');
@@ -1257,7 +1257,7 @@ async function shareResult() {
 // LEADERBOARD (per puzzle code, localStorage)
 // ──────────────────────────────────────────────
 function leaderboardKey() {
-  return `mythle_lb_${currentPuzzleCode()}`;
+  return `mythicle_lb_${currentPuzzleCode()}`;
 }
 
 function loadLeaderboard() {
@@ -1337,7 +1337,7 @@ function submitScore() {
   const name = (nameEl.value || '').trim().slice(0,16);
   if (!name) { toast('Enter a name'); return; }
 
-  localStorage.setItem('mythle_player_name', name);
+  localStorage.setItem('mythicle_player_name', name);
 
   const guesses = guessHistory.length;
   const timeSec = Math.max(0, Math.round(((finishedAtMs || Date.now()) - startedAtMs) / 1000));
