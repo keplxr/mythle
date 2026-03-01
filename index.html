@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MYTHLE — Good Mythical Wordle</title>
   <style>
@@ -685,23 +686,28 @@
   <!-- IMPORTANT: Supabase client MUST load BEFORE the game script -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    // ──────────────────────────────────────────────
-    // SUPABASE CONFIG (yours)
-    // ──────────────────────────────────────────────
-    const SUPABASE_URL = "https://etqgfzrzdrxedvhsxjfk.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_vLaCPvxW7vQbnau2p8BSDg_QnfcuY6J";
-    const LB_LIMIT = 10;
+<script defer>
+window.addEventListener('DOMContentLoaded', () => {
 
-    // Safety: never blank the whole page if Supabase fails to load
-    let supabase = null;
-    try {
-      if (!window.supabase) throw new Error("Supabase library not loaded (window.supabase is undefined).");
+  // ──────────────────────────────────────────────
+  // SUPABASE CONFIG
+  // ──────────────────────────────────────────────
+  const SUPABASE_URL = "https://etqgfzrzdrxedvhsxjfk.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_vLaCPvxW7vQbnau2p8BSDg_QnfcuY6J";
+  const LB_LIMIT = 10;
+
+  // Safety: never let Supabase kill the app
+  let supabase = null;
+  try {
+    if (window.supabase && window.supabase.createClient) {
       supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (e) {
-      console.error(e);
-      supabase = null;
+    } else {
+      console.warn("Supabase not loaded; leaderboard disabled.");
     }
+  } catch (e) {
+    console.error("Supabase init failed:", e);
+    supabase = null;
+  }
 
     // ──────────────────────────────────────────────
     // WORD LIST — GMM / Mythical themed
@@ -1307,6 +1313,12 @@
     }
 
     async function loadLeaderboard() {
+
+      if (!supabase) {
+        document.getElementById('lb-sub').textContent = 'Leaderboard unavailable';
+        return;
+      }
+      
       const code = currentPuzzleCode();
       document.getElementById('lb-sub').textContent = `Puzzle: ${code.slice(0, 10)}…`;
 
