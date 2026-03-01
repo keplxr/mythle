@@ -35,7 +35,6 @@
       overflow-x: hidden;
     }
 
-    /* ── HEADER ── */
     header {
       width: 100%;
       background: var(--red);
@@ -80,7 +79,6 @@
     }
     .how-to-btn:hover { background: rgba(240,192,64,0.15); }
 
-    /* ── MAIN LAYOUT ── */
     main {
       display: flex;
       flex-direction: column;
@@ -91,7 +89,6 @@
       max-width: 580px;
     }
 
-    /* ── INFO BAR ── */
     .info-bar {
       display: flex;
       gap: 8px;
@@ -110,7 +107,6 @@
       white-space: nowrap;
     }
 
-    /* ── HINT ── */
     .hint-area {
       text-align: center;
       display: flex;
@@ -167,7 +163,6 @@
       font-style: italic;
     }
 
-    /* ── GRID ── */
     #grid {
       display: flex;
       flex-direction: column;
@@ -221,7 +216,6 @@
       100% { transform: translateY(0); }
     }
 
-    /* ── KEYBOARD (responsive, no overflow) ── */
     #keyboard {
       display: flex;
       flex-direction: column;
@@ -273,7 +267,6 @@
       .key { height: 42px; }
     }
 
-    /* ── TOAST MESSAGE ── */
     #toast {
       position: fixed;
       top: 90px;
@@ -297,7 +290,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* ── RESULT PANEL ── */
     #result {
       display: none;
       flex-direction: column;
@@ -349,14 +341,12 @@
     .new-game-btn:hover  { background: var(--red-dark); }
     .new-game-btn:active { transform: scale(0.97); }
 
-    /* Secondary button for Share */
     .btn-secondary {
       background: rgba(255,255,255,0.06);
       border-color: rgba(240,192,64,0.55);
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.10); }
 
-    /* ── HOW TO PLAY MODAL ── */
     #modal-overlay {
       display: none;
       position: fixed;
@@ -416,7 +406,6 @@
     }
     .modal-close:hover { color: var(--text); }
 
-    /* ── FOOTER ── */
     footer {
       width: 100%;
       padding: 16px 24px;
@@ -432,7 +421,6 @@
       margin: 0 auto;
     }
 
-    /* ── CATEGORY SELECTOR ── */
     .cat-bar {
       display: flex;
       flex-wrap: wrap;
@@ -580,7 +568,6 @@
 // WORD LIST — GMM / Mythical themed
 // ──────────────────────────────────────────────
 const WORDS = [
-  // 4 letters
   { word:"LINK", cat:"People",   hint:"Thought to be a beautiful butch woman" },
   { word:"WILL", cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment" },
   { word:"DINK", cat:"Culture",  hint:"___ it and sink it!" },
@@ -588,7 +575,6 @@ const WORDS = [
   { word:"JOSH", cat:"People",   hint:"The host of Mythical Kitchen" },
   { word:"GOOD", cat:"Shows",    hint:"___ Mythical Morning" },
 
-  // 5 letters
   { word:"RHETT", cat:"People",   hint:"The tall one with the beard" },
   { word:"BEARD", cat:"Style",    hint:"Rhett's most iconic facial feature" },
   { word:"WHEEL", cat:"Segments", hint:"___ of Mythicality" },
@@ -598,26 +584,22 @@ const WORDS = [
   { word:"CANDY", cat:"Food",     hint:"Cotton ___ Randy" },
   { word:"DONUT", cat:"Food",     hint:"Will it ___?" },
 
-  // 6 letters
   { word:"STEVIE", cat:"People",   hint:"Executive producer who appears on-screen, last name Wynne Levine" },
   { word:"CEREAL", cat:"Food",     hint:"Will it ___?" },
   { word:"COFFEE", cat:"Food",     hint:"Morning brew taste test" },
   { word:"JORDAN", cat:"People",   hint:"Mythical crew member, last name Morris" },
   { word:"BUTTER", cat:"Food",     hint:"Peanut ___ boys" },
 
-  // 7 letters
   { word:"MORNING", cat:"Shows",   hint:"Good Mythical ___" },
   { word:"KITCHEN", cat:"Shows",   hint:"Mythical ___ with Chef Josh" },
   { word:"SOCIETY", cat:"Mythical",hint:"Mythical ___, their fan membership club" },
   { word:"EPISODE", cat:"Shows",   hint:"Each daily GMM upload is an ___ of the show" },
 
-  // 8 letters
   { word:"MYTHICAL",  cat:"Mythical", hint:"The brand, the company, the lifestyle — it's all ___" },
   { word:"SANDWICH",  cat:"Food",     hint:"A Hotdog Is a ____, a podcast" },
   { word:"SMOOTHIE",  cat:"Food",     hint:"Will it ___? Blended edition" },
   { word:"BISCUITS",  cat:"Podcast",  hint:"Ear ___, their long-running podcast" },
 
-  // 11 letters
   { word:"MYTHICALITY", cat:"Mythical", hint:"Spin the Wheel of ___!" },
 ];
 
@@ -630,16 +612,52 @@ const WORD_LIST = WORDS.filter(w => {
 });
 
 // ──────────────────────────────────────────────
-// SHARED PUZZLE (from URL)
-// Example: ?word=RHETT&cat=People
+// OPAQUE SHARE CODE (no answer visible in link)
 // ──────────────────────────────────────────────
+function b64urlEncode(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+    .replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+}
+function b64urlDecode(str) {
+  const pad = '='.repeat((4 - (str.length % 4)) % 4);
+  const base64 = (str + pad).replaceAll('-','+').replaceAll('_','/');
+  return decodeURIComponent(escape(atob(base64)));
+}
+
+// Lightweight obfuscation: XOR with a fixed key then base64url.
+// Not "secure", but it hides the word from normal view.
+const OBF_KEY = "MYTHLE-KEY-01";
+function xorObfuscate(plain) {
+  let out = '';
+  for (let i = 0; i < plain.length; i++) {
+    out += String.fromCharCode(plain.charCodeAt(i) ^ OBF_KEY.charCodeAt(i % OBF_KEY.length));
+  }
+  return out;
+}
+function makePuzzleCode(word) {
+  // word is uppercase already
+  const x = xorObfuscate(word);
+  return b64urlEncode(x);
+}
+function readPuzzleCode(code) {
+  try {
+    const x = b64urlDecode(code);
+    const w = xorObfuscate(x).toUpperCase().trim();
+    if (!/^[A-Z]+$/.test(w)) return null;
+    return w;
+  } catch {
+    return null;
+  }
+}
+
+// Read shared code from URL: ?p=XXXX
 const URL_PARAMS = new URLSearchParams(window.location.search);
-const FORCED_WORD = (URL_PARAMS.get('word') || '').toUpperCase().trim();
-const FORCED_CAT  = (URL_PARAMS.get('cat')  || '').trim();
+const PUZZLE_CODE = (URL_PARAMS.get('p') || '').trim();
 
 let forcedEntry = null;
-if (FORCED_WORD) {
-  forcedEntry = WORD_LIST.find(w => w.word === FORCED_WORD) || null;
+if (PUZZLE_CODE) {
+  const forcedWord = readPuzzleCode(PUZZLE_CODE);
+  if (forcedWord) forcedEntry = WORD_LIST.find(w => w.word === forcedWord) || null;
 }
 
 // ──────────────────────────────────────────────
@@ -686,7 +704,7 @@ function buildCategoryBar() {
     btn.addEventListener('click', () => {
       if (cat === selectedCategory) return;
 
-      // If you were playing a shared puzzle, clicking categories returns to normal mode
+      // exit shared puzzle mode if you click categories
       forcedEntry = null;
       window.history.replaceState({}, '', `${location.origin}${location.pathname}`);
 
@@ -732,7 +750,6 @@ function newGame() {
   let pool;
 
   if (forcedEntry) {
-    // Shared puzzle mode: always the same answer
     pool = [forcedEntry];
     selectedCategory = 'All';
   } else {
@@ -878,7 +895,6 @@ function submitGuess() {
   }
 
   const colors = scoreGuess(currentInput, answer);
-
   guessHistory.push({ guess: currentInput, colors: [...colors] });
 
   revealRow(currentRow, colors, currentInput);
@@ -901,7 +917,7 @@ function submitGuess() {
 }
 
 // ──────────────────────────────────────────────
-// SCORING (Wordle algorithm)
+// SCORING
 // ──────────────────────────────────────────────
 function scoreGuess(guess, answer) {
   const result = Array(wordLen).fill('absent');
@@ -1020,7 +1036,7 @@ function closeModalOutside(e) {
 }
 
 // ──────────────────────────────────────────────
-// SHARING (locked puzzle link)
+// SHARING (uses opaque ?p= code)
 // ──────────────────────────────────────────────
 function colorsToEmoji(colors) {
   return colors.map(c => (c === 'correct' ? '🟩' : c === 'present' ? '🟨' : '⬛')).join('');
@@ -1039,8 +1055,9 @@ function buildShareText() {
 
   const grid = guessHistory.map(r => colorsToEmoji(r.colors)).join('\n');
 
-  const playLink =
-    `${location.origin}${location.pathname}?word=${encodeURIComponent(answer)}&cat=${encodeURIComponent(cat)}`;
+  // Opaque puzzle code (does NOT show the word)
+  const code = makePuzzleCode(answer);
+  const playLink = `${location.origin}${location.pathname}?p=${encodeURIComponent(code)}`;
 
   return `${header}\n${scoreLine}\n${hintLine}\n\n${grid}\n\nPlay: ${playLink}`;
 }
@@ -1076,18 +1093,7 @@ async function shareResult() {
 // START
 // ──────────────────────────────────────────────
 buildCategoryBar();
-
-// If loaded from a shared link, try to highlight that category pill (if it exists)
-if (forcedEntry && FORCED_CAT) {
-  selectedCategory = FORCED_CAT;
-  buildCategoryBar();
-}
-
 newGame();
-
-if (forcedEntry) {
-  toast(`Shared puzzle loaded!`);
-}
 </script>
 </body>
 </html>
