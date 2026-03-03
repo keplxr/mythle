@@ -484,6 +484,65 @@
     }
     .modal-close:hover { color: var(--text); }
 
+    /* Palette picker */
+    .settings-section-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .palette-card {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 8px 9px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: center;
+      user-select: none;
+    }
+    .palette-card:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(240,192,64,0.45);
+    }
+    .palette-card.active {
+      border-color: var(--gold);
+      background: rgba(240,192,64,0.08);
+    }
+    .palette-card-name {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .palette-card.active .palette-card-name { color: var(--gold); }
+    .palette-preview {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+    .palette-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    .settings-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin: 18px 0 16px;
+    }
+
     /* How to play examples */
     .modal-examples {
       display: flex;
@@ -600,7 +659,7 @@
   <h1>MYTHICLE</h1>
   <p>Mythical Based Wordle</p>
   <button class="how-to-btn" style="left:16px;" onclick="openChangelog()" title="Devlog">📋</button>
-  <button class="how-to-btn" onclick="openModal()" title="How to play">?</button>
+  <button class="how-to-btn" onclick="openModal()" title="Settings & How to Play">⚙️</button>
   <button class="how-to-btn" style="right:56px;" onclick="goDaily()" title="Daily">📅</button>
 </header>
 
@@ -678,27 +737,32 @@
     <button class="modal-close" onclick="closeChangelog()">×</button>
     <h2>DEVLOG</h2>
 
-    <!-- ── Add new entries at the top. Move "current" class to the newest. ── -->
-
     <div class="cl-entry">
       <div class="cl-version-row">
-        <span class="cl-badge current">March 2, 2026 | 8:00 PM EST</span>
+        <span class="cl-badge current">March 2, 2026 | 10:00 PM EST</span>
         <span class="cl-date">latest</span>
       </div>
-      <p class="cl-body">What's new: More words.</p>
-      <p class="cl-body">Also I'm thinking about creating COMPLETELY OPTIONAL color palettes to choose from if you don't like the basic wordle key. (Ofc they will be GMM related).</p>
-      <p class="cl-body">I will also have a feedback form linked so you guys can lmk if you want it removed - Keplxr</p>
+      <p class="cl-body">What's new: Color Palettes and a Feedback form!</p>
+      <p class="cl-body">You can now under the "Settings and How to Play" tab select between 3 palettes: basic wordle, RandL's fav colors, and the Wheel of Mythicality colors!</p>
+      <p class="cl-body">If you don't like this change or have other things you would like to share, there is also a feedback form you can find under "Settings and Hot to Play" too! - Keplxr</p>
     </div>
 
   </div>
 </div>
 
-<!-- How to play modal -->
+<!-- Settings & How to Play modal -->
 <div id="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal">
+  <div class="modal scrollable">
     <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>HOW TO PLAY</h2>
+    <h2>SETTINGS &amp; HOW TO PLAY</h2>
 
+    <!-- ── Palette picker ── -->
+    <div class="settings-section-label">Color Palette</div>
+    <div class="palette-grid" id="palette-grid"></div>
+
+    <hr class="settings-divider" />
+
+    <!-- ── How to play ── -->
     <p>Guess the <strong>Mythical/GMM related word</strong> in the given number of tries.</p>
 
     <ul>
@@ -717,7 +781,7 @@
           <div class="ex-tile">T</div>
           <div class="ex-tile">T</div>
         </div>
-        <div class="ex-label"><strong style="color:#538d4e">Green</strong> — right letter, right spot</div>
+        <div class="ex-label" id="ex-label-correct"><strong style="color:var(--green)">■</strong> — right letter, right spot</div>
       </div>
       <div>
         <div class="ex-row">
@@ -727,7 +791,7 @@
           <div class="ex-tile">R</div>
           <div class="ex-tile">D</div>
         </div>
-        <div class="ex-label"><strong style="color:#b59f3b">Yellow</strong> — right letter, wrong spot</div>
+        <div class="ex-label" id="ex-label-present"><strong style="color:var(--yellow)">■</strong> — right letter, wrong spot</div>
       </div>
       <div>
         <div class="ex-row">
@@ -737,9 +801,17 @@
           <div class="ex-tile absent">I</div>
           <div class="ex-tile">D</div>
         </div>
-        <div class="ex-label"><strong style="color:#3a3a3c">Gray</strong> — letter not in the word</div>
+        <div class="ex-label" id="ex-label-absent"><strong style="color:var(--absent)">■</strong> — letter not in the word</div>
       </div>
     </div>
+    <hr class="settings-divider" />
+      <div style="text-align:center;">
+        <a href="https://forms.gle/RptHCFZdePRAbiah7" target="_blank" rel="noopener"
+           style="color:var(--gold); font-size:0.82rem; font-weight:700; letter-spacing:0.5px; text-decoration:none;
+  opacity:0.8;">
+          📝 Give Feedback
+        </a>
+      </div>
   </div>
 </div>
 
@@ -785,6 +857,7 @@ const WORDS = [
   { word:"SHAME",          cat:"Culture & Quotes",  hint:"James and the _____", quote:"James and the Shame"  },
   { word:"YOUTUBE",          cat:"Culture & Quotes",  hint:"The social media platform GMM uploads their full episodes daily."  },
   { word:"SOCIETY",          cat:"Culture & Quotes",  hint:"Mythical _____, their community you can join", quote:"The Mythical Society"  },
+  { word:"CAROLINA",          cat:"Culture & Quotes",  hint:"North _____, the state Rhett and Link are from", quote:"North Carolina, where the boys are from"  },
 
   // ── Songs ──
   { word:"OCD",           cat:"Songs",    hint:"It's my ____!", quote:"It's my OCD!"  },
@@ -854,6 +927,79 @@ const WORDS = [
 
 const seen = new Set();
 const WORD_LIST = WORDS.filter(w => (seen.has(w.word.toUpperCase()) ? false : (seen.add(w.word.toUpperCase()), true)));
+
+// ──────────────────────────────────────────────
+// COLOR PALETTES
+// ──────────────────────────────────────────────
+const PALETTES = {
+  classic: {
+    name: 'Classic',
+    desc: 'Standard Wordle colors',
+    correct: '#538d4e',
+    present: '#b59f3b',
+    absent:  '#3a3a3c',
+    keyBg:   '#6a6a6b',
+  },
+  mythical: {
+    name: 'Wheel of Mythicality',
+    desc: 'Wheel of Mythicality colors',
+    correct: '#31b566',
+    present: '#ed971f',
+    absent:  '#123982',
+    keyBg:   '#6a6a6b',
+  },
+  wheel: {
+    name: 'RandL',
+    desc: 'The favorite colors of Rhett and Link',
+    correct: '#ac6fd9',
+    present: '#007BA7',
+    absent:  '#3a3a3c',
+    keyBg:   '#6a6a6b',
+  },
+};
+
+let currentPalette = 'classic';
+
+function applyPalette(id) {
+  const p = PALETTES[id] || PALETTES.classic;
+  const r = document.documentElement;
+  r.style.setProperty('--green',  p.correct);
+  r.style.setProperty('--yellow', p.present);
+  r.style.setProperty('--absent', p.absent);
+  r.style.setProperty('--key-bg', p.keyBg);
+  currentPalette = id;
+  localStorage.setItem('mythicle_palette', id);
+
+  // Sync palette card active state
+  document.querySelectorAll('.palette-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.palette === id);
+  });
+}
+
+function buildPaletteGrid() {
+  const grid = document.getElementById('palette-grid');
+  grid.innerHTML = '';
+  Object.entries(PALETTES).forEach(([id, p]) => {
+    const card = document.createElement('div');
+    card.className = 'palette-card' + (id === currentPalette ? ' active' : '');
+    card.dataset.palette = id;
+    card.title = p.desc;
+    card.innerHTML = `
+      <div class="palette-card-name">${p.name}</div>
+      <div class="palette-preview">
+        <div class="palette-swatch" style="background:${p.correct}" title="Correct"></div>
+        <div class="palette-swatch" style="background:${p.present}" title="Present"></div>
+        <div class="palette-swatch" style="background:${p.absent}" title="Absent"></div>
+      </div>`;
+    card.addEventListener('click', () => applyPalette(id));
+    grid.appendChild(card);
+  });
+}
+
+function loadPalette() {
+  const saved = localStorage.getItem('mythicle_palette') || 'classic';
+  applyPalette(saved);
+}
 
 // ──────────────────────────────────────────────
 // OPAQUE SHARE CODE (?p=...)
@@ -1277,7 +1423,10 @@ function toast(msg) {
 // ──────────────────────────────────────────────
 // MODALS
 // ──────────────────────────────────────────────
-function openModal()  { document.getElementById('modal-overlay').classList.add('show'); }
+function openModal()  {
+  buildPaletteGrid();
+  document.getElementById('modal-overlay').classList.add('show');
+}
 function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
 function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
 
@@ -1430,6 +1579,8 @@ function resetLeaderboard() {
 // ──────────────────────────────────────────────
 // START
 // ──────────────────────────────────────────────
+loadPalette();
+buildPaletteGrid();
 buildCategoryBar();
 newGame();
 </script>
