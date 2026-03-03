@@ -350,9 +350,9 @@
         <span class="cl-badge current">March 2, 2026 | 4:47 PM EST </span>
         <span class="cl-date">latest</span>
       </div>
-      <p class="cl-body">I've been seeing so many people saying how much they love this! Holy crap!</p>
-      <p class="cl-body">Currently working on expanding the word bank. So expect that to grow soon.</p>
-      <p class="cl-body">Tysm for all the positivity. - Keplxr</p>
+      <p class="cl-body">What's new: More words.</p>
+      <p class="cl-body">Also I'm thinking about creating COMPLETELY OPTIONAL color palettes to choose from if you don't like the basic wordle key. (Ofc they will be GMM related).</p>
+      <p class="cl-body">I will also have a feedback form linked so you guys can lmk if you want it removed - Keplxr</p>
     </div>
 
   </div>
@@ -416,8 +416,7 @@ const WORDS = [
   { word:"JOSH",          cat:"People",   hint:"The host of Mythical Kitchen" },
   { word:"STEVIE",        cat:"People",   hint:"The disembodied voice of GMM" },
   { word:"JORDAN",        cat:"People",   hint:"Mythical crew member, last name Morris" },
-  { word:"SEAN",          cat:"People",   hint:"The dog that is also a drummer" },
-  { word:"BARBARA",       cat:"People",   hint:"Rhett's dog that loves to escape" },
+  { word:"SEAN",          cat:"People",   hint:"The dog that is also a drummer", quote:"he's like a drummer!" },
   { word:"ZEBRA",         cat:"People",   hint:"Dope ___", quote:"Dope Zebra" },
   { word:"BELVEDERE",     cat:"People",   hint:"God, also a cockatrice" },
   { word:"CHASE",         cat:"People",   hint:"Mythical crew member, last name Hilt" },
@@ -441,13 +440,17 @@ const WORDS = [
   { word:"BLEAK", cat:"Culture & Quotes", hint:"The Lost Causes of ____ Creek", quote:"Bleak Creek"  },
   { word:"TOKYO",          cat:"Culture & Quotes",  hint:"WHAAAAATTTTT?", quote:"WHHHAAATTTTTT?"  },
   { word:"COCKATRICE", cat:"Culture & Quotes", hint:"Belvedere is one" },
-  { word:"NORTH",          cat:"Culture & Quotes",  hint:"___ Carolina, the state Rhett and Link are from", quote:"North Carolina"  },
+  { word:"NORTH",          cat:"Culture & Quotes",  hint:"___ Carolina, the state Rhett and Link are from", quote:"North Carolina, where the boys are from"  },
   { word:"RANDLER", cat:"Culture & Quotes", hint:"The mythical creature based on Rhett and Link's initials" },
+  { word:"STEM",          cat:"Culture & Quotes",  hint:"___! ____! WOMEN IN ____!", quote:"STEM! STEM! WOMEN IN STEM!"  },
+  { word:"SHAME",          cat:"Culture & Quotes",  hint:"James and the _____", quote:"James and the Shame"  },
+  { word:"YOUTUBE",          cat:"Culture & Quotes",  hint:"The social media platform GMM uploads their full episodes daily."  },
+  { word:"SOCIETY",          cat:"Culture & Quotes",  hint:"Mythical _____, their community you can join", quote:"The Mythical Society"  },
 
   // ── Songs ──
   { word:"OCD",           cat:"Songs",    hint:"It's my ____!", quote:"It's my OCD!"  },
   { word:"FOG",           cat:"Songs",    hint:"Rhett and Link chase this", quote:"Fog Chasers"  },
-  { word:"BACON",         cat:"Songs",    hint:"____ bot just wants you to rub some bacon on it!", quote:"Bacon bot"  },
+  { word:"BACON",         cat:"Songs",    hint:"____ bot just wants you to rub some bacon on it!", quote:"Rub some bacon on it"  },
   { word:"NERD",          cat:"Songs",    hint:"___ vs. Geek, a rap battle", quote:"Nerd vs. Geek"  },
   { word:"BELLY",         cat:"Songs",    hint:"It's my ____ button", quote:"It's my belly button"  },
   { word:"VACATION",      cat:"Songs",    hint:"Everything's okay 'cause I'm on ______", quote:"We spent 14 hours on that sand castle!"  },
@@ -472,12 +475,13 @@ const WORDS = [
   { word:"FROZEN", cat:"Segments", hint:"____ vs. Fast vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
   { word:"FAST", cat:"Segments", hint:"Frozen vs. ____ vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
   { word:"FANCY", cat:"Segments", hint:"Frozen vs. Fast vs. ____", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"LAST",         cat:"Segments", hint:"___ meals, a segment on Mythical Kitchen", quote:"Last Meals" },
 
   // ── Food ──
   { word:"CHILI",         cat:"Food",     hint:"Will it ___?, with or without beans", quote:"Will it Chili?" },
   { word:"DONUT",         cat:"Food",     hint:"Will it ___?, breakfast with a missing middle", quote:"Will it Donut?" },
   { word:"CEREAL",        cat:"Food",     hint:"Will it ___?, Link loves this", quote:"Will it Cereal?" },
-  { word:"BUTTER",        cat:"Food",     hint:"Peanut ___ boys", quote:"Peanutbutter boys" },
+  { word:"BUTTER",        cat:"Food",     hint:"Peanut ___ boys", quote:"Peanut butter boys" },
   { word:"TOMATO",        cat:"Food",     hint:"A food Link hates" },
   { word:"BEANS",         cat:"Food",     hint:"Rhett loves these" },
   { word:"SMASH",         cat:"Food",     hint:"Will it ___ Burger?", quote:"Will it Smash Burger?" },
@@ -498,7 +502,7 @@ const WORDS = [
   // ── Shows ──
   { word:"GOOD",          cat:"Shows",    hint:"___ Mythical Morning", quote:"Good Mythical Morning" },
   { word:"EVENING",       cat:"Shows",    hint:"Good Mythical _____, their yearly adult show", quote:"Good Mythical Evening" },
-  { word:"KITCHEN",       cat:"Shows",    hint:"Mythical ___ with Chef Josh" },
+  { word:"KITCHEN",       cat:"Shows",    hint:"Mythical ___ with Chef Josh", quote:"Mythical Kitchen" },
   { word:"WONDERHOLE",    cat:"Shows",    hint:"A show made by Rhett and Link that aired in 2024. Currently has two seasons." },
   { word:"BUDDY",         cat:"Shows",    hint:"____ System, a comedy series Rhett and Link made in 2016", quote:"Buddy System" },
   { word:"MORE",        cat:"Shows",    hint:"The after-show that follows GMM, Good Mythical ___", quote:"Good Mythical More" },
