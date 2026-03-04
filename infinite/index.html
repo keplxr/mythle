@@ -1,1 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MYTHICLE — Good Mythical Wordle</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --red: #529e5e;
+      --red-dark: #244f23;
+      --gold: #f0c040;
+      --green: #538d4e;
+      --yellow: #b59f3b;
+      --absent: #3a3a3c;
+      --tile-border: #444;
+      --tile-empty: #121212;
+      --bg: #111111;
+      --surface: #1e1e1e;
+      --text: #ffffff;
+      --text-dim: rgba(255,255,255,0.55);
+      --key-bg: #6a6a6b;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      background: var(--red);
+      border-bottom: 3px solid var(--gold);
+      padding: 14px 20px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+      position: relative;
+    }
+    header h1 {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+    }
+    header p {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 1.5px;
+      margin-top: 3px;
+      text-transform: uppercase;
+    }
+    .how-to-btn {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .how-to-btn:hover { background: rgba(240,192,64,0.15); }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px 24px;
+      gap: 14px;
+      width: 100%;
+      max-width: 580px;
+    }
+
+    .info-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .badge {
+      background: rgba(240,192,64,0.1);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+    }
+
+    .hint-area {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .hint-reveal-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px dashed rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.65);
+      padding: 9px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hint-reveal-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.4);
+      color: #fff;
+    }
+    .hint-cost-badge {
+      background: rgba(192,57,43,0.35);
+      border: 1px solid rgba(192,57,43,0.6);
+      color: #ff9080;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .hint-revealed {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .hint-revealed.show { display: flex; }
+    .hint-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ff9080;
+      font-weight: 700;
+    }
+    .hint-text {
+      font-size: 0.92rem;
+      color: rgba(255,255,255,0.85);
+      font-style: italic;
+    }
+
+    #grid { display: flex; flex-direction: column; gap: 5px; }
+    .grid-row { display: flex; gap: 5px; }
+
+    .tile {
+      --size: 58px;
+      width: var(--size);
+      height: var(--size);
+      border: 2px solid var(--tile-border);
+      background: var(--tile-empty);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--size) * 0.5);
+      font-weight: 900;
+      text-transform: uppercase;
+      user-select: none;
+      transition: border-color 0.05s;
+    }
+    .tile.filled  { border-color: #888; }
+    .tile.correct { background: var(--green);  border-color: var(--green);  color: #fff; }
+    .tile.present { background: var(--yellow); border-color: var(--yellow); color: #fff; }
+    .tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
+
+    .tile.pop { animation: pop 0.1s ease; }
+    @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+    .shake { animation: shake 0.45s ease; }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-5px)}
+      40%{transform:translateX(5px)}
+      60%{transform:translateX(-5px)}
+      80%{transform:translateX(5px)}
+    }
+    .tile.bounce { animation: bounce 0.5s ease forwards; }
+    @keyframes bounce { 0%{transform:translateY(0)} 40%{transform:translateY(-18px)} 70%{transform:translateY(-8px)} 100%{transform:translateY(0)} }
+
+    #keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+      width: 100%;
+      padding: 0 10px;
+      max-width: 580px;
+    }
+    .kb-row {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      gap: clamp(3px, 0.8vw, 6px);
+    }
+    .key {
+      background: var(--key-bg);
+      color: var(--text);
+      border: none;
+      border-radius: 4px;
+      height: clamp(44px, 7.2vw, 56px);
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: clamp(28px, 8.5vw, 44px);
+      padding: 0;
+      font-size: clamp(0.62rem, 1.9vw, 0.82rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.08s;
+      user-select: none;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .key.wide {
+      flex: 1.35 1 0;
+      max-width: clamp(48px, 14vw, 74px);
+      font-size: clamp(0.55rem, 1.7vw, 0.7rem);
+    }
+    .key:active { transform: scale(0.93); }
+    .key.correct { background: var(--green); }
+    .key.present { background: var(--yellow); }
+    .key.absent  { background: var(--absent); }
+
+    #toast {
+      position: fixed;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: #fff;
+      color: #111;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 200;
+      max-width: 85vw;
+      text-align: center;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    #result {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 22px 20px;
+      text-align: center;
+      animation: fadeUp 0.35s ease;
+      width: 100%;
+      max-width: 420px;
+    }
+    #result.show { display: flex; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* STREAK */
+    .streak-bar { display: flex; gap: 8px; justify-content: center; width: 100%; }
+    .streak-stat {
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; padding: 10px 0; flex: 1;
+    }
+    .streak-num { font-size: 1.4rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .streak-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-dim); margin-top: 4px; }
+
+    #result h2 { font-size: 1.6rem; color: var(--gold); letter-spacing: 2px; }
+    #result p  { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
+
+    .answer-display {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: rgba(240,192,64,0.1);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(240,192,64,0.3);
+      width: 100%;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .new-game-btn {
+      background: var(--red);
+      color: #fff;
+      border: 2px solid var(--gold);
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .new-game-btn:hover  { background: var(--red-dark); }
+    .new-game-btn:active { transform: scale(0.97); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(240,192,64,0.55);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.10); }
+
+    /* Leaderboard UI */
+    .lb {
+      width: 100%;
+      border: 1px solid rgba(240,192,64,0.25);
+      border-radius: 12px;
+      padding: 14px 12px;
+      background: rgba(0,0,0,0.25);
+      text-align: left;
+    }
+    .lb-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .lb-title h3 {
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .lb-sub {
+      color: rgba(255,255,255,0.45);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .lb-form {
+      display: none;
+      gap: 8px;
+      margin: 10px 0 8px;
+    }
+    .lb-form.show { display: flex; }
+    .lb-input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      padding: 10px 10px;
+      border-radius: 8px;
+      outline: none;
+      font-weight: 700;
+    }
+    .lb-input::placeholder { color: rgba(255,255,255,0.35); }
+    .lb-submit {
+      background: rgba(240,192,64,0.18);
+      border: 1px solid rgba(240,192,64,0.55);
+      color: var(--gold);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+    .lb-submit:hover { background: rgba(240,192,64,0.25); }
+
+    .lb-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-left: 0;
+      margin: 0;
+    }
+    .lb-item {
+      display: grid;
+      grid-template-columns: 26px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .lb-rank {
+      color: rgba(255,255,255,0.55);
+      font-weight: 900;
+      font-size: 0.85rem;
+    }
+    .lb-name {
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+    .lb-meta {
+      color: rgba(255,255,255,0.55);
+      font-weight: 800;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+    .lb-empty {
+      color: rgba(255,255,255,0.45);
+      font-size: 0.85rem;
+      padding: 6px 2px 2px;
+    }
+    .lb-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: flex-end;
+    }
+    .lb-link {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.7);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .lb-link:hover { border-color: rgba(240,192,64,0.45); color: var(--gold); }
+
+    /* Modals */
+    #modal-overlay,
+    #changelog-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #modal-overlay.show,
+    #changelog-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 28px 24px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+    }
+    .modal.scrollable {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      color: var(--gold);
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .modal p, .modal li {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .modal ul { padding-left: 18px; margin-bottom: 14px; }
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none; border: none; color: var(--text-dim);
+      font-size: 1.4rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+
+    /* Palette picker */
+    .settings-section-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .palette-card {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      padding: 10px 8px 9px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: center;
+      user-select: none;
+    }
+    .palette-card:hover {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(240,192,64,0.45);
+    }
+    .palette-card.active {
+      border-color: var(--gold);
+      background: rgba(240,192,64,0.08);
+    }
+    .palette-card-name {
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .palette-card.active .palette-card-name { color: var(--gold); }
+    .palette-preview {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+    .palette-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+    .settings-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin: 18px 0 16px;
+    }
+
+    /* How to play examples */
+    .modal-examples {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .ex-row { display: flex; gap: 4px; }
+    .ex-tile {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 0.9rem;
+      border: 2px solid var(--tile-border);
+      background: var(--tile-empty);
+    }
+    .ex-tile.correct { background: var(--green);  border-color: var(--green);  color: #fff; }
+    .ex-tile.present { background: var(--yellow); border-color: var(--yellow); color: #fff; }
+    .ex-tile.absent  { background: var(--absent); border-color: var(--absent); color: #fff; }
+    .ex-label { font-size: 0.8rem; color: var(--text-dim); }
+
+    /* Devlog / Changelog */
+    .cl-entry {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .cl-entry:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .cl-version-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .cl-badge {
+      background: rgba(240,192,64,0.15);
+      border: 1px solid rgba(240,192,64,0.4);
+      color: var(--gold);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .cl-badge.current {
+      background: rgba(83,141,78,0.25);
+      border-color: rgba(83,141,78,0.6);
+      color: #6fcf64;
+    }
+    .cl-date {
+      color: rgba(255,255,255,0.35);
+      font-size: 0.72rem;
+    }
+    .cl-body {
+      color: rgba(255,255,255,0.72);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    .cl-body + .cl-body { margin-top: 8px; }
+
+    /* Category bar */
+    .cat-bar { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 2px 6px; width: 100%; }
+    .cat-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.55);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .cat-pill:hover {
+      background: rgba(240,192,64,0.12);
+      border-color: rgba(240,192,64,0.4);
+      color: var(--gold);
+    }
+    .cat-pill.active { background: var(--red); border-color: var(--gold); color: var(--gold); }
+    .cat-section-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-dim);
+      align-self: flex-start;
+    }
+
+    footer {
+      width: 100%;
+      padding: 16px 24px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: auto;
+    }
+    footer p {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.5;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MYTHICLE</h1>
+  <p>Infinite Mythical Wordle</p>
+  <button class="how-to-btn" style="left:16px;" onclick="openChangelog()" title="Devlog">📋</button>
+  <button class="how-to-btn" onclick="openModal()" title="Settings & How to Play">⚙️</button>
+  <button class="how-to-btn" style="right:56px;" onclick="goDaily()" title="Daily">📅</button>
+</header>
+
+<main>
+  <div style="width:100%">
+    <div class="cat-section-label" style="margin-bottom:6px">Category</div>
+    <div class="cat-bar" id="cat-bar"></div>
+  </div>
+
+  <div class="info-bar">
+    <span class="badge" id="badge-length">? Letters</span>
+    <span class="badge" id="badge-cat">Category: ?</span>
+    <span class="badge" id="badge-guesses">? Guesses</span>
+  </div>
+
+  <div class="hint-area">
+    <button class="hint-reveal-btn" id="hint-reveal-btn" onclick="revealHint()">
+      🔒 Reveal Hint
+      <span class="hint-cost-badge">−1 GUESS</span>
+    </button>
+    <div class="hint-revealed" id="hint-revealed">
+      <div class="hint-label">🔓 Hint (−1 guess used)</div>
+      <div class="hint-text" id="hint-text"></div>
+    </div>
+  </div>
+
+  <div id="grid"></div>
+
+  <div id="result">
+    <h2 id="result-title"></h2>
+    <p id="result-msg"></p>
+    <div class="answer-display" id="result-answer"></div>
+     <div id="result-word-info" style="font-size:0.82rem; color:rgba(255,255,255,0.6); font-style:italic;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px 14px;
+      width:100%; text-align:center;"></div>
+
+    <div class="lb" id="lb-wrap">
+      <div class="lb-title">
+        <h3>Leaderboard</h3>
+        <div class="lb-sub" id="lb-sub">This device only</div>
+      </div>
+      <div class="lb-form" id="lb-form">
+        <input class="lb-input" id="lb-name" maxlength="16" placeholder="Your name (max 16)" />
+        <button class="lb-submit" onclick="submitScore()">Submit</button>
+      </div>
+      <ul class="lb-list" id="lb-list"></ul>
+      <div class="lb-empty" id="lb-empty" style="display:none;">No scores yet. Be the first.</div>
+      <div class="lb-actions">
+        <button class="lb-link" onclick="resetLeaderboard()">Reset board</button>
+      </div>
+    </div>
+
+    <div class="streak-bar" id="result-streak"></div>
+    <div class="btn-row">
+      <button class="new-game-btn" onclick="newGame()">Play Again</button>
+      <button class="new-game-btn btn-secondary" onclick="shareResult()">Share</button>
+    </div>
+  </div>
+
+  <div id="keyboard">
+    <div class="kb-row" id="kb-row-1"></div>
+    <div class="kb-row" id="kb-row-2"></div>
+    <div class="kb-row" id="kb-row-3"></div>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<footer>
+  <p style="font-size:0.68rem; color:rgba(255,255,255,0.2); margin-bottom:6px; letter-spacing:1px;">v1.4</p>
+  <p>MYTHICLE is unofficial fan-made content and is not affiliated with, endorsed by, or licensed by Mythical Entertainment, Good Mythical Morning, or Rhett &amp; Link in any way.</p>
+</footer>
+
+<!-- Devlog modal -->
+<div id="changelog-overlay" onclick="closeChangelogOutside(event)">
+  <div class="modal scrollable">
+    <button class="modal-close" onclick="closeChangelog()">×</button>
+    <h2>DEVLOG</h2>
+
+    <div class="cl-entry">
+      <div class="cl-version-row">
+        <span class="cl-badge current">March 4, 2026 | 11:02 AM EST</span>
+        <span class="cl-date">latest</span>
+      </div>
+      <p class="cl-body">What's new: Changed location of infinite and daily</p>
+      <p class="cl-body">Heard some people were struggling to find the daily, so I made the home link the daily instead.</p>
+      <p class="cl-body">Tysm for the feedback! - Keplxr</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Settings & How to Play modal -->
+<div id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal scrollable">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>SETTINGS &amp; HOW TO PLAY</h2>
+
+    <!-- ── Palette picker ── -->
+    <div class="settings-section-label">Color Palette</div>
+    <div class="palette-grid" id="palette-grid"></div>
+
+    <hr class="settings-divider" />
+
+    <!-- ── How to play ── -->
+    <p>Guess the <strong>Mythical/GMM related word</strong> in the given number of tries.</p>
+
+    <ul>
+      <li>Each guess must use the correct number of letters.</li>
+      <li>Words vary in length. The letter count is shown above.</li>
+      <li>Use the <strong>Hint</strong> for a clue about the word. (Costs 1 guess!)</li>
+      <li>After each guess, tiles change color:</li>
+    </ul>
+
+    <div class="modal-examples">
+      <div>
+        <div class="ex-row">
+          <div class="ex-tile correct">R</div>
+          <div class="ex-tile">H</div>
+          <div class="ex-tile">E</div>
+          <div class="ex-tile">T</div>
+          <div class="ex-tile">T</div>
+        </div>
+        <div class="ex-label" id="ex-label-correct"><strong style="color:var(--green)">■</strong> — right letter, right spot</div>
+      </div>
+      <div>
+        <div class="ex-row">
+          <div class="ex-tile">B</div>
+          <div class="ex-tile present">E</div>
+          <div class="ex-tile">A</div>
+          <div class="ex-tile">R</div>
+          <div class="ex-tile">D</div>
+        </div>
+        <div class="ex-label" id="ex-label-present"><strong style="color:var(--yellow)">■</strong> — right letter, wrong spot</div>
+      </div>
+      <div>
+        <div class="ex-row">
+          <div class="ex-tile">P</div>
+          <div class="ex-tile">L</div>
+          <div class="ex-tile">A</div>
+          <div class="ex-tile absent">I</div>
+          <div class="ex-tile">D</div>
+        </div>
+        <div class="ex-label" id="ex-label-absent"><strong style="color:var(--absent)">■</strong> — letter not in the word</div>
+      </div>
+    </div>
+    <hr class="settings-divider" />
+      <div style="text-align:center;">
+        <a href="https://forms.gle/RptHCFZdePRAbiah7" target="_blank" rel="noopener"
+           style="color:var(--gold); font-size:0.82rem; font-weight:700; letter-spacing:0.5px; text-decoration:none;
+  opacity:0.8;">
+          📝 Give Feedback
+        </a>
+      </div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// WORD LIST
+// ──────────────────────────────────────────────
+const WORDS = [
+  { word:"LINK",          cat:"People",   hint:"Thought to be a beautiful butch woman" },
+  { word:"CHICA",          cat:"People",   hint:"Topo ____, Link's drag persona", quote:"Topo Chica" },
+  { word:"WHETT",          cat:"People",   hint:"____, Rhett's drag persona" },
+  { word:"RHETT",         cat:"People",   hint:"The tall one with the beard" },
+  { word:"JOSH",          cat:"People",   hint:"The host of Mythical Kitchen" },
+  { word:"STEVIE",        cat:"People",   hint:"The disembodied voice of GMM" },
+  { word:"JORDAN",        cat:"People",   hint:"Mythical crew member, last name Morris" },
+  { word:"SEAN",          cat:"People",   hint:"The dog that is also a drummer", quote:"he's like a drummer!" },
+  { word:"ZEBRA",         cat:"People",   hint:"Dope ___", quote:"Dope Zebra" },
+  { word:"BELVEDERE",     cat:"People",   hint:"God, also a cockatrice" },
+  { word:"CHASE",         cat:"People",   hint:"Mythical crew member, last name Hilt" },
+  { word:"DAVIN",         cat:"People",   hint:"Mythical crew member, last name Tjen" },
+  { word:"COTTON",        cat:"People",   hint:"___ Candy Randy", quote:"Cotton Candy Randy" },
+  { word:"CARNEY",        cat:"People",   hint:"Mythical crew member, first name Matt" },
+  { word:"EMILY", cat:"People", hint:"Mythical crew member, last name Fleming" },
+  { word:"MOOCHELLE", cat:"People", hint:"Anthropomorphic cow, was eventually killed" },
+
+  // ── Culture ──
+  { word:"DINK",          cat:"Culture & Quotes",  hint:"___ it and sink it!", quote:"Dink it and Sink it!"  },
+  { word:"SINK",          cat:"Culture & Quotes",  hint:"Dink it and ___ it!", quote:"Dink it and Sink it!"  },
+  { word:"BEAST",         cat:"Culture & Quotes",  hint:"Mythical ____, the name of the fans", quote:"A Mythical Beast! An amazing name for a fan."  },
+  { word:"BECOMING",      cat:"Culture & Quotes",  hint:"I think I'm ____ bi!", quote:"I think I'm becoming bi!"  },
+  { word:"THIS",          cat:"Culture & Quotes",  hint:"Would you like some of ___ on your that?", quote:"Would you like some of this on your that?"  },
+  { word:"CHIA",          cat:"Culture & Quotes",  hint:"___ Lincoln, the centerpiece of Rhett and Link's morning show before GMM", quote:"Chia Lincoln"  },
+  { word:"LTAT",          cat:"Culture & Quotes",  hint:"Abbreviation for 'Let's Talk About That', a GMM spinoff show" },
+  { word:"FAJITAS",          cat:"Culture & Quotes",  hint:"When the ____ come out sizzling!", quote:"When the fajitas cpme out sizzling!"  },
+  { word:"MYTHICON", cat:"Culture & Quotes", hint:"The Mythical fan convention" },
+  { word:"CREEK", cat:"Culture & Quotes", hint:"The Lost Causes of Bleak ___", quote:"Bleak Creek"  },
+  { word:"BLEAK", cat:"Culture & Quotes", hint:"The Lost Causes of ____ Creek", quote:"Bleak Creek"  },
+  { word:"TOKYO",          cat:"Culture & Quotes",  hint:"WHAAAAATTTTT?", quote:"WHHHAAATTTTTT?"  },
+  { word:"COCKATRICE", cat:"Culture & Quotes", hint:"Belvedere is one" },
+  { word:"NORTH",          cat:"Culture & Quotes",  hint:"___ Carolina, the state Rhett and Link are from", quote:"North Carolina, where the boys are from"  },
+  { word:"RANDLER", cat:"Culture & Quotes", hint:"The mythical creature based on Rhett and Link's initials" },
+  { word:"STEM",          cat:"Culture & Quotes",  hint:"___! ____! WOMEN IN ____!", quote:"STEM! STEM! WOMEN IN STEM!"  },
+  { word:"SHAME",          cat:"Culture & Quotes",  hint:"James and the _____", quote:"James and the Shame"  },
+  { word:"YOUTUBE",          cat:"Culture & Quotes",  hint:"The social media platform GMM uploads their full episodes daily."  },
+  { word:"SOCIETY",          cat:"Culture & Quotes",  hint:"Mythical _____, their community you can join", quote:"The Mythical Society"  },
+  { word:"CAROLINA",          cat:"Culture & Quotes",  hint:"North _____, the state Rhett and Link are from", quote:"North Carolina, where the boys are from"  },
+
+  // ── Songs ──
+  { word:"OCD",           cat:"Songs",    hint:"It's my ____!", quote:"It's my OCD!"  },
+  { word:"FOG",           cat:"Songs",    hint:"Rhett and Link chase this", quote:"Fog Chasers"  },
+  { word:"BACON",         cat:"Songs",    hint:"____ bot just wants you to rub some bacon on it!", quote:"Rub some bacon on it"  },
+  { word:"NERD",          cat:"Songs",    hint:"___ vs. Geek, a rap battle", quote:"Nerd vs. Geek"  },
+  { word:"BELLY",         cat:"Songs",    hint:"It's my ____ button", quote:"It's my belly button"  },
+  { word:"VACATION",      cat:"Songs",    hint:"Everything's okay 'cause I'm on ______", quote:"We spent 14 hours on that sand castle!"  },
+  { word:"NILLA",         cat:"Songs",    hint:"The wafer used to make this top hat", quote:"Nilla Wafer Top Hat Time"  },
+  { word:"PHAT",          cat:"Songs",    hint:"___dippin'", quote:"Phatdippin'"  },
+  { word:"FACEBOOK",      cat:"Songs",    hint:"Rhett & Link's parody song about the social network", quote:"The Facebook Song"  },
+  { word:"EPIC",          cat:"Songs",    hint:"___ Rap Battle. Rhett and Link's musical battle series", quote:"Epic Rap Battle series"  },
+  { word:"HERE",           cat:"Songs",    hint:"You Are ____", quote:"We're not queer, but to be clear, we are supportive"  },
+  { word:"HONEST",           cat:"Songs",    hint:"Just Being ____, a song where Rhett and Link tell the truth", quote:"Honesty means that much to me"  },
+  { word:"WHALE",          cat:"Songs",    hint:"It's gonna die no matter if you use paper or plastic", quote:"A whale is gonna die"  },
+
+  // ── Segments ──
+  { word:"WILL",          cat:"Segments", hint:"\"___ It?\" is a beloved challenge segment", quote:"Will It?" },
+  { word:"WHEEL",         cat:"Segments", hint:"___ of Mythicality", quote:"Wheel of Mythicality!" },
+  { word:"TASTE",         cat:"Segments", hint:"___ test, a staple segment", quote:"Taste Test" },
+  { word:"GAME",          cat:"Segments", hint:"Are you a ____ in the Dark?", quote:"Are you a Game in the Dark?" },
+  { word:"BLIND",         cat:"Segments", hint:"___ taste test, no peeking allowed", quote:"Blind Taste Test" },
+  { word:"NEW",         cat:"Segments", hint:"___ Tool or Old School", quote:"New Tool or Old School?" },
+  { word:"OLD",         cat:"Segments", hint:"New Tool or ____ School", quote:"New Tool or Old School?" },
+  { word:"SCORN",         cat:"Segments", hint:"___hole, corn hole of the least liked items", quote:"Scornhole" },
+  { word:"DARTS", cat:"Segments", hint:"International Taste Test uses ___", quote:"Used in International Taste Tests" },
+  { word:"FROZEN", cat:"Segments", hint:"____ vs. Fast vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"FAST", cat:"Segments", hint:"Frozen vs. ____ vs. Fancy", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"FANCY", cat:"Segments", hint:"Frozen vs. Fast vs. ____", quote:"Frozen vs. Fast vs. Fancy" },
+  { word:"LAST",         cat:"Segments", hint:"___ meals, a segment on Mythical Kitchen", quote:"Last Meals" },
+
+  // ── Food ──
+  { word:"CHILI",         cat:"Food",     hint:"Will it ___?, with or without beans", quote:"Will it Chili?" },
+  { word:"DONUT",         cat:"Food",     hint:"Will it ___?, breakfast with a missing middle", quote:"Will it Donut?" },
+  { word:"CEREAL",        cat:"Food",     hint:"Will it ___?, Link loves this", quote:"Will it Cereal?" },
+  { word:"BUTTER",        cat:"Food",     hint:"Peanut ___ boys", quote:"Peanut butter boys" },
+  { word:"TOMATO",        cat:"Food",     hint:"A food Link hates" },
+  { word:"BEANS",         cat:"Food",     hint:"Rhett loves these" },
+  { word:"SMASH",         cat:"Food",     hint:"Will it ___ Burger?", quote:"Will it Smash Burger?" },
+  { word:"CHIPS",         cat:"Food",     hint:"Will it ___ and Salsa?", quote:"Will it Chips and Salsa?" },
+  { word:"TOAST",         cat:"Food",     hint:"Will it ___?, crunchy bread", quote:"Will it Toast?" },
+  { word:"SMOOTHIE",      cat:"Food",     hint:"Will it ___?, blended delight", quote:"Will it Smoothie?" },
+  { word:"WAFFLE",        cat:"Food",     hint:"Will it ___?, breakfast circle", quote:"Will it Waffle?" },
+  { word:"SLUSHIE",         cat:"Food",     hint:"Will it ___?, drinkable snow", quote:"Will it Slushie?" },
+  { word:"UNCRUSTABLE",         cat:"Food",     hint:"Will it ___?, no crust", quote:"Will it Uncrustable?" },
+  { word:"CALZONE",          cat:"Food",     hint:"Will it ___?, folded pizza", quote:"Will it Calzone?" },
+  { word:"SUB",         cat:"Food",     hint:"Will it ___?, lunch the long way", quote:"Will it Sub?" },
+  { word:"RAVIOLI",         cat:"Food",     hint:"Will it ___?, pocket pasta", quote:"Will it Ravioli?" },
+  { word:"BROWNIE",         cat:"Food",     hint:"Will it ___?, edges vs. center", quote:"Will it Brownie?" },
+  { word:"FRIES",        cat:"Food",     hint:"Will it ___?, parallel potatoes", quote:"Will it Fries?" },
+  { word:"QUESADILLA",        cat:"Food",     hint:"Will it ___?, a tortilla with a molten middle", quote:"Will it Quesadilla?" },
+  { word:"TAQUITO",         cat:"Food",     hint:"Will it ___?, small fried cylinder", quote:"Will it Taquito?" },
+
+  // ── Shows ──
+  { word:"GOOD",          cat:"Shows",    hint:"___ Mythical Morning", quote:"Good Mythical Morning" },
+  { word:"EVENING",       cat:"Shows",    hint:"Good Mythical _____, their yearly adult show", quote:"Good Mythical Evening" },
+  { word:"KITCHEN",       cat:"Shows",    hint:"Mythical ___ with Chef Josh", quote:"Mythical Kitchen" },
+  { word:"WONDERHOLE",    cat:"Shows",    hint:"A show made by Rhett and Link that aired in 2024. Currently has two seasons." },
+  { word:"BUDDY",         cat:"Shows",    hint:"____ System, a comedy series Rhett and Link made in 2016", quote:"Buddy System" },
+  { word:"MORE",        cat:"Shows",    hint:"The after-show that follows GMM, Good Mythical ___", quote:"Good Mythical More" },
+
+  // ── Podcast ──
+  { word:"BISCUITS",      cat:"Podcast",  hint:"Ear ___, their long-running podcast", quote:"Ear Biscuits" },
+  { word:"SANDWICH",      cat:"Podcast",  hint:"A Hotdog Is a ____", quote:"A Hotdog Is a Sandwich" },
+  { word:"MYRTLE",        cat:"Podcast",  hint:"Dispatches From _____ Beach", quote:"Dispatches From Myrtle Beach" },
+];
+
+const seen = new Set();
+const WORD_LIST = WORDS.filter(w => (seen.has(w.word.toUpperCase()) ? false : (seen.add(w.word.toUpperCase()), true)));
+
+// ──────────────────────────────────────────────
+// COLOR PALETTES
+// ──────────────────────────────────────────────
+const PALETTES = {
+  classic: {
+    name: 'Classic',
+    desc: 'Standard Wordle colors',
+    correct: '#538d4e',
+    present: '#b59f3b',
+    absent:  '#3a3a3c',
+    keyBg:   '#6a6a6b',
+  },
+  mythical: {
+    name: 'Wheel of Mythicality',
+    desc: 'Wheel of Mythicality colors',
+    correct: '#31b566',
+    present: '#ed971f',
+    absent:  '#123982',
+    keyBg:   '#6a6a6b',
+  },
+  wheel: {
+    name: 'RandL',
+    desc: 'The favorite colors of Rhett and Link',
+    correct: '#ac6fd9',
+    present: '#007BA7',
+    absent:  '#3a3a3c',
+    keyBg:   '#6a6a6b',
+  },
+};
+
+let currentPalette = 'classic';
+
+function applyPalette(id) {
+  const p = PALETTES[id] || PALETTES.classic;
+  const r = document.documentElement;
+  r.style.setProperty('--green',  p.correct);
+  r.style.setProperty('--yellow', p.present);
+  r.style.setProperty('--absent', p.absent);
+  r.style.setProperty('--key-bg', p.keyBg);
+  currentPalette = id;
+  localStorage.setItem('mythicle_palette', id);
+
+  // Sync palette card active state
+  document.querySelectorAll('.palette-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.palette === id);
+  });
+}
+
+function buildPaletteGrid() {
+  const grid = document.getElementById('palette-grid');
+  grid.innerHTML = '';
+  Object.entries(PALETTES).forEach(([id, p]) => {
+    const card = document.createElement('div');
+    card.className = 'palette-card' + (id === currentPalette ? ' active' : '');
+    card.dataset.palette = id;
+    card.title = p.desc;
+    card.innerHTML = `
+      <div class="palette-card-name">${p.name}</div>
+      <div class="palette-preview">
+        <div class="palette-swatch" style="background:${p.correct}" title="Correct"></div>
+        <div class="palette-swatch" style="background:${p.present}" title="Present"></div>
+        <div class="palette-swatch" style="background:${p.absent}" title="Absent"></div>
+      </div>`;
+    card.addEventListener('click', () => applyPalette(id));
+    grid.appendChild(card);
+  });
+}
+
+function loadPalette() {
+  const saved = localStorage.getItem('mythicle_palette') || 'classic';
+  applyPalette(saved);
+}
+
+// ──────────────────────────────────────────────
+// OPAQUE SHARE CODE (?p=...)
+// ──────────────────────────────────────────────
+function b64urlEncode(str) {
+  return btoa(unescape(encodeURIComponent(str)))
+    .replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
+}
+function b64urlDecode(str) {
+  const pad = '='.repeat((4 - (str.length % 4)) % 4);
+  const base64 = (str + pad).replaceAll('-','+').replaceAll('_','/');
+  return decodeURIComponent(escape(atob(base64)));
+}
+
+const OBF_KEY = "MYTHICLE-KEY-01";
+function xorObfuscate(plain) {
+  let out = '';
+  for (let i = 0; i < plain.length; i++) {
+    out += String.fromCharCode(plain.charCodeAt(i) ^ OBF_KEY.charCodeAt(i % OBF_KEY.length));
+  }
+  return out;
+}
+function makePuzzleCode(word) {
+  return b64urlEncode(xorObfuscate(word));
+}
+function readPuzzleCode(code) {
+  try {
+    const w = xorObfuscate(b64urlDecode(code)).toUpperCase().trim();
+    if (!/^[A-Z]+$/.test(w)) return null;
+    return w;
+  } catch { return null; }
+}
+
+const URL_PARAMS = new URLSearchParams(window.location.search);
+const PUZZLE_CODE = (URL_PARAMS.get('p') || '').trim();
+
+let forcedEntry = null;
+if (PUZZLE_CODE) {
+  const forcedWord = readPuzzleCode(PUZZLE_CODE);
+  if (forcedWord) forcedEntry = WORD_LIST.find(w => w.word.toUpperCase() === forcedWord) || null;
+}
+
+function goDaily() {
+  window.location.href = "/mythicle-admin/";
+}
+
+// ──────────────────────────────────────────────
+// GAME STATE
+// ──────────────────────────────────────────────
+let selectedCategory = 'All';
+let hintRevealed = false;
+let hintUsed = false;
+let answer = '';
+let wordLen = 0;
+let maxGuesses = 6;
+let currentRow = 0;
+let currentInput = '';
+let gameOver = false;
+let letterStatus = {};
+let guessHistory = [];
+
+let startedAtMs = 0;
+let finishedAtMs = 0;
+
+const WIN_LINES = [
+  { title: "BOOM!", msg: "Excellent work! You're a true Mythical Beast!" },
+  { title: "DINK IT!", msg: "Dink it and sink it! Perfect guessing!" },
+  { title: "WILL IT WIN?", msg: "YES IT WILL! Great Mythical instincts!" },
+];
+const LOSE_LINES = [
+  { title: "SO CLOSE!", msg: "But not close enough. Nice Try." },
+  { title: "NOT TODAY!", msg: "Don't worry, tomorrow's a new episode." },
+];
+
+// ──────────────────────────────────────────────
+// CATEGORY BAR
+// ──────────────────────────────────────────────
+function buildCategoryBar() {
+  const counts = {};
+  WORD_LIST.forEach(w => { counts[w.cat] = (counts[w.cat] || 0) + 1; });
+  const cats = ['All', ...Object.keys(counts).sort()];
+  counts['All'] = WORD_LIST.length;
+
+  const bar = document.getElementById('cat-bar');
+  bar.innerHTML = '';
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill' + (cat === selectedCategory ? ' active' : '');
+    btn.textContent = `${cat} (${counts[cat]})`;
+    btn.title = cat === 'All' ? 'All categories' : `${counts[cat]} word${counts[cat] !== 1 ? 's' : ''}`;
+    btn.addEventListener('click', () => {
+      if (cat === selectedCategory) return;
+      forcedEntry = null;
+      window.history.replaceState({}, '', `${location.origin}${location.pathname}`);
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      newGame();
+    });
+    bar.appendChild(btn);
+  });
+}
+
+// ──────────────────────────────────────────────
+// HINT
+// ──────────────────────────────────────────────
+function revealHint() {
+  if (hintRevealed || gameOver) return;
+  if (maxGuesses - currentRow <= 1) {
+    toast("Not enough guesses left to spend on a hint!");
+    return;
+  }
+  hintRevealed = true;
+  hintUsed = true;
+  maxGuesses--;
+
+  const grid = document.getElementById('grid');
+  const rows = grid.querySelectorAll('.grid-row');
+  grid.removeChild(rows[rows.length - 1]);
+
+  document.getElementById('badge-guesses').textContent = `${maxGuesses} Guesses`;
+  document.getElementById('hint-reveal-btn').style.display = 'none';
+  document.getElementById('hint-revealed').classList.add('show');
+  toast('Hint revealed! −1 guess');
+}
+
+// ──────────────────────────────────────────────
+// NEW GAME
+// ──────────────────────────────────────────────
+function newGame() {
+  let pool;
+  if (forcedEntry) {
+    pool = [forcedEntry];
+    selectedCategory = 'All';
+  } else {
+    pool = selectedCategory === 'All'
+      ? WORD_LIST
+      : WORD_LIST.filter(w => w.cat === selectedCategory);
+  }
+  if (!pool.length) { toast('No words in this category!'); return; }
+
+  const entry = pool[Math.floor(Math.random() * pool.length)];
+
+  answer       = entry.word.toUpperCase();
+  wordLen      = answer.length;
+  maxGuesses   = 6;
+  currentRow   = 0;
+  currentInput = '';
+  gameOver     = false;
+  letterStatus = {};
+  hintRevealed = false;
+  hintUsed     = false;
+  guessHistory = [];
+  startedAtMs  = Date.now();
+  finishedAtMs = 0;
+
+  document.getElementById('badge-length').textContent   = `${wordLen} Letters`;
+  document.getElementById('badge-cat').textContent      = `Category: ${entry.cat}`;
+  document.getElementById('badge-guesses').textContent  = `${maxGuesses} Guesses`;
+  document.getElementById('hint-text').textContent      = entry.hint;
+  document.getElementById('hint-reveal-btn').style.display = '';
+  document.getElementById('hint-revealed').classList.remove('show');
+  document.getElementById('result').classList.remove('show');
+
+  buildGrid();
+  buildKeyboard();
+  renderLeaderboard();
+}
+
+// ──────────────────────────────────────────────
+// GRID
+// ──────────────────────────────────────────────
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  const vw = Math.min(window.innerWidth, 580);
+  const maxTileArea = vw - 32;
+  const rawSize = Math.floor((maxTileArea - (wordLen - 1) * 5) / wordLen);
+  const tileSize = Math.max(36, Math.min(62, rawSize));
+
+  for (let r = 0; r < maxGuesses; r++) {
+    const row = document.createElement('div');
+    row.className = 'grid-row';
+    row.id = `row-${r}`;
+    for (let c = 0; c < wordLen; c++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.id = `tile-${r}-${c}`;
+      tile.style.cssText = `--size: ${tileSize}px; font-size: ${Math.round(tileSize * 0.48)}px;`;
+      row.appendChild(tile);
+    }
+    grid.appendChild(row);
+  }
+}
+
+// ──────────────────────────────────────────────
+// KEYBOARD
+// ──────────────────────────────────────────────
+const KB_ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['ENTER','Z','X','C','V','B','N','M','⌫'],
+];
+
+function buildKeyboard() {
+  KB_ROWS.forEach((row, i) => {
+    const el = document.getElementById(`kb-row-${i + 1}`);
+    el.innerHTML = '';
+    row.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'key' + (k.length > 1 ? ' wide' : '');
+      btn.textContent = k;
+      btn.dataset.key = k;
+      btn.addEventListener('click', () => handleKey(k));
+      el.appendChild(btn);
+    });
+  });
+}
+
+function syncKeyboard() {
+  document.querySelectorAll('.key').forEach(btn => {
+    const k = btn.dataset.key;
+    const s = letterStatus[k];
+    btn.className = 'key' + (k.length > 1 ? ' wide' : '') + (s ? ` ${s}` : '');
+  });
+}
+
+// ──────────────────────────────────────────────
+// INPUT
+// ──────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  const k = e.key.toUpperCase();
+  if (k === 'BACKSPACE') handleKey('⌫');
+  else if (k === 'ENTER') handleKey('ENTER');
+  else if (/^[A-Z]$/.test(k)) handleKey(k);
+});
+
+function handleKey(key) {
+  if (gameOver) return;
+  if (key === '⌫') deleteLetter();
+  else if (key === 'ENTER') submitGuess();
+  else if (/^[A-Z]$/.test(key)) addLetter(key);
+}
+
+function addLetter(letter) {
+  if (currentInput.length >= wordLen) return;
+  currentInput += letter;
+  const idx = currentInput.length - 1;
+  const tile = document.getElementById(`tile-${currentRow}-${idx}`);
+  tile.textContent = letter;
+  tile.classList.add('filled');
+  tile.classList.remove('pop');
+  void tile.offsetWidth;
+  tile.classList.add('pop');
+}
+
+function deleteLetter() {
+  if (!currentInput.length) return;
+  const idx = currentInput.length - 1;
+  const tile = document.getElementById(`tile-${currentRow}-${idx}`);
+  tile.textContent = '';
+  tile.classList.remove('filled', 'pop');
+  currentInput = currentInput.slice(0, -1);
+}
+
+// ──────────────────────────────────────────────
+// GUESS
+// ──────────────────────────────────────────────
+function submitGuess() {
+  if (currentInput.length < wordLen) {
+    toast(`Need ${wordLen} letters!`);
+    shakeRow(currentRow);
+    return;
+  }
+
+  const colors = scoreGuess(currentInput, answer);
+  guessHistory.push({ guess: currentInput, colors: [...colors] });
+  revealRow(currentRow, colors, currentInput);
+
+  const won = currentInput === answer;
+  const rowIndex = currentRow;
+  currentRow++;
+  currentInput = '';
+
+  const totalDelay = wordLen * 320 + 200;
+
+  if (won) {
+    gameOver = true;
+    finishedAtMs = Date.now();
+    setTimeout(() => bounceRow(rowIndex), totalDelay);
+    setTimeout(() => showResult(true, rowIndex + 1), totalDelay + wordLen * 80 + 200);
+  } else if (currentRow >= maxGuesses) {
+    gameOver = true;
+    finishedAtMs = Date.now();
+    setTimeout(() => showResult(false, 0), totalDelay);
+  }
+}
+
+// ──────────────────────────────────────────────
+// SCORING
+// ──────────────────────────────────────────────
+function scoreGuess(guess, answer) {
+  const result   = Array(wordLen).fill('absent');
+  const aLetters = answer.split('');
+  const gLetters = guess.split('');
+
+  for (let i = 0; i < wordLen; i++) {
+    if (gLetters[i] === aLetters[i]) {
+      result[i]   = 'correct';
+      aLetters[i] = null;
+      gLetters[i] = null;
+    }
+  }
+  for (let i = 0; i < wordLen; i++) {
+    if (!gLetters[i]) continue;
+    const ai = aLetters.indexOf(gLetters[i]);
+    if (ai !== -1) {
+      result[i]    = 'present';
+      aLetters[ai] = null;
+    }
+  }
+  return result;
+}
+
+// ──────────────────────────────────────────────
+// REVEAL
+// ──────────────────────────────────────────────
+function revealRow(rowIndex, colors, guess) {
+  const priority = { correct: 3, present: 2, absent: 1 };
+
+  for (let c = 0; c < wordLen; c++) {
+    const tile  = document.getElementById(`tile-${rowIndex}-${c}`);
+    const color = colors[c];
+    const delay = c * 320;
+
+    setTimeout(() => {
+      tile.style.transition = 'transform 0.16s ease-in';
+      tile.style.transform  = 'rotateX(90deg)';
+      setTimeout(() => {
+        tile.classList.add(color);
+        tile.classList.remove('filled');
+        tile.style.transition = 'transform 0.16s ease-out';
+        tile.style.transform  = 'rotateX(0deg)';
+
+        const letter = guess[c];
+        const cur = letterStatus[letter];
+        if (!cur || priority[color] > priority[cur]) letterStatus[letter] = color;
+        syncKeyboard();
+      }, 160);
+    }, delay);
+  }
+}
+
+function bounceRow(rowIndex) {
+  for (let c = 0; c < wordLen; c++) {
+    const tile = document.getElementById(`tile-${rowIndex}-${c}`);
+    setTimeout(() => {
+      tile.classList.remove('bounce');
+      void tile.offsetWidth;
+      tile.classList.add('bounce');
+    }, c * 80);
+  }
+}
+
+function shakeRow(rowIndex) {
+  const row = document.getElementById(`row-${rowIndex}`);
+  row.classList.remove('shake');
+  void row.offsetWidth;
+  row.classList.add('shake');
+  row.addEventListener('animationend', () => row.classList.remove('shake'), { once: true });
+}
+
+// ──────────────────────────────────────────────
+// STREAK
+// ──────────────────────────────────────────────
+const INF_STREAK_KEY = 'mythicle_inf_streak_v1';
+function getInfStreak() {
+  try { const r = localStorage.getItem(INF_STREAK_KEY); return r ? JSON.parse(r) : { cur: 0, max: 0, played: 0, won: 0 }; }
+  catch { return { cur: 0, max: 0, played: 0, won: 0 }; }
+}
+function updateInfStreak(won) {
+  const s = getInfStreak();
+  s.played++;
+  if (won) { s.won++; s.cur++; s.max = Math.max(s.max, s.cur); }
+  else { s.cur = 0; }
+  try { localStorage.setItem(INF_STREAK_KEY, JSON.stringify(s)); } catch {}
+  return s;
+}
+function renderInfStreak() {
+  const el = document.getElementById('result-streak'); if (!el) return;
+  const s = getInfStreak();
+  const winPct = s.played > 0 ? Math.round(s.won / s.played * 100) : 0;
+  el.innerHTML = `
+    <div class="streak-stat"><div class="streak-num">${s.cur}</div><div class="streak-label">🔥 Streak</div></div>
+    <div class="streak-stat"><div class="streak-num">${s.max}</div><div class="streak-label">🏆 Best</div></div>
+    <div class="streak-stat"><div class="streak-num">${s.played}</div><div class="streak-label">📅 Played</div></div>
+    <div class="streak-stat"><div class="streak-num">${winPct}%</div><div class="streak-label">✅ Win %</div></div>`;
+}
+
+// ──────────────────────────────────────────────
+// RESULT
+// ──────────────────────────────────────────────
+function showResult(won, guessCount) {
+  const lines  = won ? WIN_LINES : LOSE_LINES;
+  const picked = lines[Math.floor(Math.random() * lines.length)];
+
+  document.getElementById('result-title').textContent = picked.title;
+  document.getElementById('result-msg').textContent   = picked.msg;
+
+  const elapsedSec = Math.max(0, Math.round(((finishedAtMs || Date.now()) - startedAtMs) / 1000));
+  const timeStr    = formatTime(elapsedSec);
+
+  if (won) {
+    document.getElementById('result-answer').textContent =
+      `Solved in ${guessCount}/${maxGuesses} • ${timeStr} • Hint: ${hintUsed ? 'Yes' : 'No'}`;
+  } else {
+    document.getElementById('result-answer').textContent =
+      `The word was: ${answer} • Time: ${timeStr}`;
+  }
+
+  const form = document.getElementById('lb-form');
+  form.classList.toggle('show', won);
+
+  const lastName = localStorage.getItem('mythicle_player_name') || '';
+  document.getElementById('lb-name').value = lastName;
+
+  const entry = WORD_LIST.find(w => w.word.toUpperCase() === answer);
+  document.getElementById('result-word-info').textContent = entry?.quote ? `"${entry.quote}"` : '';
+
+  renderLeaderboard();
+  updateInfStreak(won);
+  renderInfStreak();
+  document.getElementById('result').classList.add('show');
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+// ──────────────────────────────────────────────
+// MODALS
+// ──────────────────────────────────────────────
+function openModal()  {
+  buildPaletteGrid();
+  document.getElementById('modal-overlay').classList.add('show');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+
+function openChangelog()  { document.getElementById('changelog-overlay').classList.add('show'); }
+function closeChangelog() { document.getElementById('changelog-overlay').classList.remove('show'); }
+function closeChangelogOutside(e) { if (e.target === document.getElementById('changelog-overlay')) closeChangelog(); }
+
+// ──────────────────────────────────────────────
+// SHARING
+// ──────────────────────────────────────────────
+function colorsToEmoji(colors) {
+  return colors.map(c => c === 'correct' ? '🟩' : c === 'present' ? '🟨' : '⬛').join('');
+}
+
+function currentPuzzleCode() {
+  if (PUZZLE_CODE) return PUZZLE_CODE;
+  return makePuzzleCode(answer);
+}
+
+function puzzleLink() {
+  return `${location.origin}${location.pathname}?p=${encodeURIComponent(currentPuzzleCode())}`;
+}
+
+function buildShareText() {
+  const entry = WORD_LIST.find(w => w.word.toUpperCase() === answer);
+  const cat   = entry ? entry.cat : selectedCategory;
+  const won   = guessHistory.length > 0 && guessHistory[guessHistory.length - 1].guess === answer;
+  const elapsedSec = Math.max(0, Math.round(((finishedAtMs || Date.now()) - startedAtMs) / 1000));
+  const timeStr    = formatTime(elapsedSec);
+  const header    = `MYTHICLE — ${cat} • ${wordLen} letters`;
+  const scoreLine = won
+    ? `Score: ${guessHistory.length}/${maxGuesses} • Time: ${timeStr} • Hint: ${hintUsed ? 'Yes' : 'No'}`
+    : `Score: X/${maxGuesses}`;
+  const grid = guessHistory.map(r => colorsToEmoji(r.colors)).join('\n');
+  return `${header}\n${scoreLine}\n\n${grid}\n\nPlay: ${puzzleLink()}`;
+}
+
+async function shareResult() {
+  if (!gameOver) { toast("Finish the game first!"); return; }
+  const text = buildShareText();
+  try {
+    if (navigator.share) { await navigator.share({ title: 'MYTHICLE', text }); return; }
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      toast('Copied to clipboard!');
+      return;
+    }
+    window.prompt('Copy your results:', text);
+  } catch (err) {
+    if (String(err).toLowerCase().includes('abort')) return;
+    window.prompt('Copy your results:', text);
+  }
+}
+
+// ──────────────────────────────────────────────
+// LEADERBOARD
+// ──────────────────────────────────────────────
+function leaderboardKey() {
+  return `mythicle_lb_${currentPuzzleCode()}`;
+}
+
+function loadLeaderboard() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(leaderboardKey()) || '[]');
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+
+function saveLeaderboard(arr) {
+  localStorage.setItem(leaderboardKey(), JSON.stringify(arr));
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return m > 0 ? `${m}:${String(s).padStart(2,'0')}` : `${s}s`;
+}
+
+function sortLeaderboard(arr) {
+  return arr.sort((a, b) =>
+    (a.guesses - b.guesses) ||
+    (a.timeSec - b.timeSec) ||
+    ((a.hintUsed === b.hintUsed) ? 0 : (a.hintUsed ? 1 : -1)) ||
+    (a.at - b.at)
+  );
+}
+
+function renderLeaderboard() {
+  const list  = document.getElementById('lb-list');
+  const empty = document.getElementById('lb-empty');
+  const board = sortLeaderboard(loadLeaderboard()).slice(0, 10);
+
+  list.innerHTML = '';
+  empty.style.display = board.length ? 'none' : 'block';
+
+  const entry = WORD_LIST.find(w => w.word.toUpperCase() === answer);
+  const cat   = entry ? entry.cat : 'Unknown';
+  document.getElementById('lb-sub').textContent = `Puzzle: ${cat} • ${wordLen} letters (this device)`;
+
+  board.forEach((row, i) => {
+    const li   = document.createElement('li');
+    li.className = 'lb-item';
+
+    const rank = document.createElement('div');
+    rank.className = 'lb-rank';
+    rank.textContent = `#${i+1}`;
+
+    const name = document.createElement('div');
+    name.className = 'lb-name';
+    name.textContent = row.name;
+
+    const meta = document.createElement('div');
+    meta.className = 'lb-meta';
+    meta.textContent = `${row.guesses}g • ${formatTime(row.timeSec)} • ${row.hintUsed ? 'hint' : 'no-hint'}`;
+
+    li.appendChild(rank);
+    li.appendChild(name);
+    li.appendChild(meta);
+    list.appendChild(li);
+  });
+}
+
+function submitScore() {
+  if (!gameOver) { toast('Finish first!'); return; }
+  const won = guessHistory.length > 0 && guessHistory[guessHistory.length - 1].guess === answer;
+  if (!won) { toast('Only wins can be submitted.'); return; }
+
+  const nameEl = document.getElementById('lb-name');
+  const name   = (nameEl.value || '').trim().slice(0, 16);
+  if (!name) { toast('Enter a name'); return; }
+
+  localStorage.setItem('mythicle_player_name', name);
+
+  const timeSec = Math.max(0, Math.round(((finishedAtMs || Date.now()) - startedAtMs) / 1000));
+  const board   = loadLeaderboard();
+  board.push({ name, guesses: guessHistory.length, timeSec, hintUsed: !!hintUsed, at: Date.now() });
+  saveLeaderboard(sortLeaderboard(board).slice(0, 50));
+  toast('Score submitted!');
+  renderLeaderboard();
+  document.getElementById('lb-form').classList.remove('show');
+}
+
+function resetLeaderboard() {
+  if (!confirm('Reset this puzzle leaderboard on THIS device?')) return;
+  localStorage.removeItem(leaderboardKey());
+  toast('Leaderboard reset.');
+  renderLeaderboard();
+}
+
+// ──────────────────────────────────────────────
+// START
+// ──────────────────────────────────────────────
+loadPalette();
+buildPaletteGrid();
+buildCategoryBar();
+newGame();
+</script>
+  <script data-goatcounter="https://keplxr.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
